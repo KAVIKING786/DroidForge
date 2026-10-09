@@ -15,22 +15,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/cirruslabs/android-sdk:34
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Accept Android SDK Licenses
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-
-      - name: Generate Lightweight Android App
+      - name: Generate Android Project
         run: |
           mkdir -p app/src/main/java/com/droidforge/app
           mkdir -p app/src/main/res/values
@@ -138,11 +127,10 @@ jobs:
           }
           EOF
 
-      - name: Build Standalone APK without external cache
+      - name: Build Debug APK
         run: |
-          gradle wrapper --gradle-version 8.2.1 --distribution-type bin
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          gradle wrapper --gradle-version 8.2.2
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload Real APK Artifact
         uses: actions/upload-artifact@v4
