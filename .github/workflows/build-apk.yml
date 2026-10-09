@@ -6,7 +6,7 @@ on:
       app_name:
         description: 'App Name'
         required: true
-        default: 'DroidForgeApp'
+        default: 'My_App'
       web_url:
         description: 'Website URL'
         required: true
@@ -33,16 +33,23 @@ jobs:
         run: |
           mkdir -p app/src/main/java/com/droidforge/app
           mkdir -p app/src/main/res/values
-          mkdir -p app/src/main/res/mipmap-xxxhdpi
 
-          # 1. build.gradle
+          # 1. Root build.gradle
           cat << 'EOF' > build.gradle
           buildscript {
-              repositories { google(); mavenCentral() }
-              dependencies { classpath 'com.android.tools.build:gradle:8.2.2' }
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.2.2'
+              }
           }
           allprojects {
-              repositories { google(); mavenCentral() }
+              repositories {
+                  google()
+                  mavenCentral()
+              }
           }
           EOF
 
@@ -70,7 +77,6 @@ jobs:
           }
           dependencies {
               implementation 'androidx.appcompat:appcompat:1.6.1'
-              implementation 'com.google.android.material:material:1.11.0'
           }
           EOF
 
@@ -94,7 +100,7 @@ jobs:
           </manifest>
           EOF
 
-          # 5. MainActivity.java (Real WebView Engine)
+          # 5. MainActivity.java (Native Webview Runtime)
           cat << 'EOF' > app/src/main/java/com/droidforge/app/MainActivity.java
           package com.droidforge.app;
           import android.os.Bundle;
@@ -118,7 +124,7 @@ jobs:
           }
           EOF
 
-      - name: Build Standalone Debug APK
+      - name: Build Standalone APK
         run: gradle assembleDebug
 
       - name: Upload Real APK Artifact
