@@ -26,7 +26,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Generate Native Android Project
+      - name: Accept Android SDK Licenses & Setup Env
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+      - name: Generate Lightweight Android App
         run: |
           mkdir -p app/src/main/java/com/droidforge/app
           mkdir -p app/src/main/res/values
@@ -39,7 +43,7 @@ jobs:
                   mavenCentral()
               }
               dependencies {
-                  classpath 'com.android.tools.build:gradle:8.7.0'
+                  classpath 'com.android.tools.build:gradle:8.2.2'
               }
           }
           allprojects {
@@ -58,22 +62,30 @@ jobs:
           plugins {
               id 'com.android.application'
           }
+
           android {
               namespace 'com.droidforge.app'
               compileSdk 34
+
               defaultConfig {
                   applicationId "com.droidforge.app"
-                  minSdk 24
+                  minSdk 21
                   targetSdk 34
                   versionCode 1
                   versionName "1.0"
               }
+
               buildTypes {
                   release {
                       minifyEnabled false
                   }
               }
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
           }
+
           dependencies {
               implementation 'androidx.appcompat:appcompat:1.6.1'
           }
@@ -89,7 +101,9 @@ jobs:
                   android:label="${{ github.event.inputs.app_name }}"
                   android:allowBackup="true"
                   android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-                  <activity android:name=".MainActivity" android:exported="true">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN" />
                           <category android:name="android.intent.category.LAUNCHER" />
@@ -102,6 +116,7 @@ jobs:
           # 5. MainActivity.java
           cat << 'EOF' > app/src/main/java/com/droidforge/app/MainActivity.java
           package com.droidforge.app;
+
           import android.os.Bundle;
           import android.webkit.WebSettings;
           import android.webkit.WebView;
@@ -126,10 +141,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: '8.10'
+          gradle-version: '8.2.1'
 
-      - name: Build APK
-        run: gradle assembleDebug --no-daemon
+      - name: Compile and Build APK
+        run: |
+          gradle assembleDebug --no-daemon
 
       - name: Upload Real APK Artifact
         uses: actions/upload-artifact@v4
