@@ -30,18 +30,15 @@ jobs:
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-      - name: Download & Setup Official Gradle 8.5
-        run: |
-          wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip
-          unzip -q gradle-8.5-bin.zip
-          echo "$GITHUB_WORKSPACE/gradle-8.5/bin" >> $GITHUB_PATH
-
-      - name: Generate Android Project
+      - name: Setup Android Project Skeleton
         run: |
           mkdir -p app/src/main/java/com/droidforge/app
           mkdir -p app/src/main/res/values
 
-          # 1. Root build.gradle
+          # settings.gradle
+          printf "include ':app'\n" > settings.gradle
+
+          # root build.gradle
           cat << 'EOF' > build.gradle
           buildscript {
               repositories {
@@ -49,7 +46,7 @@ jobs:
                   mavenCentral()
               }
               dependencies {
-                  classpath 'com.android.tools.build:gradle:8.2.2'
+                  classpath 'com.android.tools.build:gradle:8.1.4'
               }
           }
           allprojects {
@@ -60,17 +57,14 @@ jobs:
           }
           EOF
 
-          # 2. settings.gradle
-          echo "include ':app'" > settings.gradle
-
-          # 3. app/build.gradle
+          # app/build.gradle
           cat << 'EOF' > app/build.gradle
-          plugins {
-              id 'com.android.application'
-          }
+          apply plugin: 'com.android.application'
+
           android {
               namespace 'com.droidforge.app'
               compileSdk 34
+
               defaultConfig {
                   applicationId "com.droidforge.app"
                   minSdk 21
@@ -78,6 +72,7 @@ jobs:
                   versionCode 1
                   versionName "1.0"
               }
+
               buildTypes {
                   release {
                       minifyEnabled false
@@ -88,12 +83,13 @@ jobs:
                   targetCompatibility JavaVersion.VERSION_17
               }
           }
+
           dependencies {
               implementation 'androidx.appcompat:appcompat:1.6.1'
           }
           EOF
 
-          # 4. AndroidManifest.xml
+          # app/src/main/AndroidManifest.xml
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -115,9 +111,10 @@ jobs:
           </manifest>
           EOF
 
-          # 5. MainActivity.java
+          # app/src/main/java/com/droidforge/app/MainActivity.java
           cat << 'EOF' > app/src/main/java/com/droidforge/app/MainActivity.java
           package com.droidforge.app;
+
           import android.os.Bundle;
           import android.webkit.WebSettings;
           import android.webkit.WebView;
@@ -139,9 +136,14 @@ jobs:
           }
           EOF
 
-      - name: Build APK Directly
-        run: |
-          gradle assembleDebug --no-daemon
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.1.1'
+          cache-disabled: true
+
+      - name: Build Debug APK
+        run: gradle assembleDebug --no-daemon
 
       - name: Upload Real APK Artifact
         uses: actions/upload-artifact@v4
