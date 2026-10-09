@@ -26,7 +26,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Accept Android SDK Licenses & Setup Env
+      - name: Accept Android SDK Licenses
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
@@ -138,14 +138,11 @@ jobs:
           }
           EOF
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '8.2.1'
-
-      - name: Compile and Build APK
+      - name: Build Standalone APK without external cache
         run: |
-          gradle assembleDebug --no-daemon
+          gradle wrapper --gradle-version 8.2.1 --distribution-type bin
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload Real APK Artifact
         uses: actions/upload-artifact@v4
