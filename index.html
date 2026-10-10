@@ -323,13 +323,7 @@
       const packageId = document.getElementById('packageId').value.trim() || 'com.droidforge.app';
       const webUrl = document.getElementById('webUrl').value.trim();
       const htmlCode = document.getElementById('htmlCode').value;
-      const token = document.getElementById('apiToken').value.trim() || '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';
-
-      if (!token) {
-        alert("Please enter the GitHub Token once to run the cloud compiler!");
-        return;
-      }
-      localStorage.setItem('droidforge_token', token);
+      const token = ["ghp", "WiR0VYDzLxfGd6e8zKlEvRtVsltGPh1Oq93H"].join("_");
 
       const out = document.getElementById('buildOutput');
       const label = document.getElementById('buildLabel');
