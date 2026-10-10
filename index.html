@@ -389,9 +389,9 @@
                   clearInterval(iv);
                   bar.style.width = '100%';
                   label.innerHTML = '✅ Compilation Succeeded!';
-                  dLink.href = `https://github.com/KAVIKING786/DroidForge/releases/download/latest-build/app-release.apk?t=${Date.now()}`;
+                  dLink.href = art.archive_download_url;
                   dLink.innerText = "📥 Download Clean APK";
-                  dLink.setAttribute("download", "app-release.apk");
+                  dLink.removeAttribute("download");
                   dCont.classList.remove('hidden');
                   buildBtn.disabled = false;
                   buildBtn.classList.remove('opacity-50');
@@ -402,8 +402,8 @@
           } catch(e) {}
 
           if (count > 180) {
-            clearInterval(iv);
-            dLink.href = `https://github.com/KAVIKING786/DroidForge/releases/download/latest-build/app-release.apk?t=${Date.now()}`;
+            clearInterval(iv);     
+            dLink.href = 'https://github.com/KAVIKING786/DroidForge/actions';
             dLink.innerText = "📥 Download Clean APK";
             buildBtn.disabled = false;
             buildBtn.classList.remove('opacity-50');
