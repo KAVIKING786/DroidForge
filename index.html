@@ -391,29 +391,32 @@
 
             if (latestRun && latestRun.status === 'completed') {
               if (latestRun.conclusion === 'success') {
-                const rRes = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/releases/tags/latest-build', {
-                  headers: { 'Authorization': 'Bearer ' + token }
-                });
+          const rRes = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/releases', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
 
-                if (rRes.ok) {
-                  const relData = await rRes.json();
-                  const apkAsset = relData.assets && relData.assets.find(a => a.name.endsWith('.apk'));
+        if (rRes.ok) {
+          const releases = await rRes.json();
+          const latestRel = releases && releases[0];
+          const apkAsset = latestRel && latestRel.assets && latestRel.assets.find(a => a.name.endsWith('.apk'));
 
-                  if (apkAsset) {
-                    clearInterval(iv);
-                    bar.style.width = '100%';
-                    bar.style.background = '#10b981';
-                    timer.innerText = '100%';
-                    label.innerHTML = 'Compilation Succeeded';
-                    dLink.href = apkAsset.browser_download_url;
-                    dLink.innerText = 'Download APK';
-                    dLink.onclick = null;
-                    dCont.classList.remove('hidden');
-                    buildBtn.disabled = false;
-                    buildBtn.classList.remove('opacity-50');
-                    return;
-                  }
-                }
+          if (apkAsset) {
+            clearInterval(iv);
+            bar.style.width = '100%';
+            bar.style.background = '#10b981';
+            timer.innerText = '100%';
+            label.innerHTML = 'Compilation Succeeded';
+            dLink.href = apkAsset.browser_download_url;
+            dLink.innerText = 'Download APK';
+            dLink.onclick = null;
+            dCont.classList.remove('hidden');
+            buildBtn.disabled = false;
+            buildBtn.classList.remove('opacity-50');
+            return;
+          }
+        }
+
+
               } else {
                 clearInterval(iv);
                 bar.style.width = '100%';
