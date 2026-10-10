@@ -33,14 +33,15 @@ jobs:
       image: beevelop/cordova:latest
       
     steps:
+    
       - name: Create App Project
         run: |
           cordova create myApp ${{ github.event.inputs.package_id }} "${{ github.event.inputs.app_name }}"
           cd myApp
           cordova platform add android
 
-                    if [ "${{ github.event.inputs.source_type }}" = "html" ]; then
-            echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html
+                                        if [ "${{ github.event.inputs.source_type }}" = "html" ]; then
+            printf "%s" "${{ github.event.inputs.html_content }}" | base64 --decode > www/index.html
           else
             cat << 'EOF' > www/index.html
             <!DOCTYPE html>
