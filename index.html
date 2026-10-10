@@ -371,37 +371,29 @@
           timer.innerText = `${count}s`;
 
           try {
-            const aRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/artifacts`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (aRes.ok) {
-              const data = await aRes.json();
-              if (data.artifacts && data.artifacts.length > 0) {
-                const art = data.artifacts[0];
-                const dt = new Date(art.created_at);
-                if ((new Date() - dt) < 200000) {
-                  clearInterval(iv);
-                  bar.style.width = '100%';
-                  label.innerHTML = '✅ Compilation Succeeded!';
-                            dLink.href = "#";
-          dLink.innerText = "📥 Download Clean APK";
-          dLink.onclick = async (e) => {
-            e.preventDefault();
-            dLink.innerText = "⏳ Downloading...";
-            const blobRes = await fetch(art.archive_download_url, {
-              headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const blob = await blobRes.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${appName || 'app'}.zip`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-            dLink.innerText = "✅ Download Complete!";
-          };
+          const rRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/tags/latest-build`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (rRes.ok) {
+          const relData = await rRes.json();
+          const apkAsset = relData.assets && relData.assets.find(a => a.name.endsWith('.apk'));
+          if (apkAsset) {
+            const dt = new Date(apkAsset.updated_at || apkAsset.created_at);
+            if ((new Date() - dt) < 300000) {
+              clearInterval(iv);
+              bar.style.width = '100%';
+              label.innerHTML = '✅ Compilation Succeeded!';
+              dLink.href = apkAsset.browser_download_url;
+              dLink.innerText = '📥 Download Clean APK';
+              dLink.onclick = null;
+              dCont.classList.remove('hidden');
+              buildBtn.disabled = false;
+              buildBtn.classList.remove('opacity-50');
+              return;
+            }
+          }
+        }
+
                   dCont.classList.remove('hidden');
                   buildBtn.disabled = false;
                   buildBtn.classList.remove('opacity-50');
