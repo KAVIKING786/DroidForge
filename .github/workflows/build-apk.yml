@@ -72,3 +72,4 @@ jobs:
           files: myApp/platforms/android/app/build/outputs/apk/debug/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
