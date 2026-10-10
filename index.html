@@ -370,8 +370,8 @@
           count += 5;
           timer.innerText = `${count}s`;
 
-          try {
-          const rRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/tags/latest-build`, {
+        try {
+        const rRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/tags/latest-build`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (rRes.ok) {
@@ -393,24 +393,14 @@
             }
           }
         }
+          } catch (err) {
+      console.error(err);
+    }
 
-                  dCont.classList.remove('hidden');
-                  buildBtn.disabled = false;
-                  buildBtn.classList.remove('opacity-50');
-                  return;
-                }
-              }
-            }
-          } catch(e) {}
-
-          if (count > 180) {
-            clearInterval(iv);     
-            dLink.href = 'https://github.com/KAVIKING786/DroidForge/actions';
-            dLink.innerText = "📥 Download Clean APK";
-            buildBtn.disabled = false;
-            buildBtn.classList.remove('opacity-50');
-          }
-        }, 5000);
+    if (count > 180) {
+      clearInterval(iv);
+    }
+  }, 5000);
 
       } catch (err) {
         alert(err.message);
