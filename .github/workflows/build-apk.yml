@@ -33,7 +33,7 @@ jobs:
       image: beevelop/cordova:latest
       
     steps:
-    
+        
       - name: Create App Project
         run: |
           cordova create myApp ${{ github.event.inputs.package_id }} "${{ github.event.inputs.app_name }}"
@@ -41,26 +41,24 @@ jobs:
           cordova platform add android
           cordova plugin add cordova-plugin-whitelist
           cordova plugin add cordova-plugin-android-permissions
-         
-            if [ "${{ github.event.inputs.source_type }}" = "html" ]; then
-            echo '${{ github.event.inputs.html_content }}' | base64 -d > www/index.html
+
+          if [ "${{ github.event.inputs.source_type }}" = "html" ]; then
+            echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html
           else
             cat << 'EOF' > www/index.html
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta http-equiv="refresh" content="0; url=${{ github.event.inputs.web_url }}">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    body { background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
-                </style>
-            </head>
-            <body>
-                <p>Loading application...</p>
-            </body>
-            </html>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv="refresh" content="0; url=${{ github.event.inputs.web_url }}">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>body { background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }</style>
+          </head>
+          <body>
+            <p>Loading application...</p>
+          </body>
+          </html>
           EOF
-                    fi
+          fi
 
       - name: Build APK File
         run: |
