@@ -1,424 +1,421 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DroidForge — Pro Cloud APK & AAB Builder</title>
+  <title>DroidForge - 100% Free Real APK Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background-color: #0b0e14; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
-    .card { background-color: #151b23; border: 1px solid #30363d; }
-    .input-field { background-color: #0b0e14; border: 1px solid #30363d; outline: none; }
-    .input-field:focus { border-color: #38bdf8; }
+    body { background-color: #06090e; font-family: system-ui, -apple-system, sans-serif; color: #f1f5f9; }
+    .glass-card { background: #0d1117; border: 1px solid #21262d; border-radius: 1.25rem; }
     .tab-active { border-bottom: 2px solid #38bdf8; color: #38bdf8; }
+    .btn-selected { background-color: #0284c7 !important; color: #ffffff !important; border-color: #0284c7 !important; }
   </style>
 </head>
-<body class="p-3 max-w-lg mx-auto min-h-screen flex flex-col justify-between pb-24">
+<body class="min-h-screen p-3 sm:p-6 flex flex-col items-center">
 
-  <div>
-    <!-- Top Advertisement Banner Space -->
-    <div id="topAdSpace" class="w-full h-16 bg-gray-900 border border-dashed border-gray-700 rounded-xl flex flex-col items-center justify-center text-center mb-3">
-      <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Advertisement Space (Google AdSense / Network)</span>
-      <span class="text-xs text-sky-400">728x90 / Responsive Top Banner Ad</span>
+  <div class="w-full max-w-xl space-y-4">
+    
+    <!-- Top Header Notice -->
+    <div class="text-center text-xs text-gray-400 font-medium">
+      No Watermark • 100% Free Real APK Builder
     </div>
 
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-3">
-      <div>
-        <h1 class="text-2xl font-black tracking-wide text-white">Droid<span class="text-sky-400">Forge</span></h1>
-        <p class="text-xs text-gray-400">No Watermark • 100% Free Full APK Engine</p>
-      </div>
-      <span class="text-xs bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-2.5 py-1 rounded-full font-medium">Cloud Pro</span>
+    <!-- Main Navigation Tabs -->
+    <div class="flex border-b border-gray-800 text-xs font-semibold">
+      <button onclick="switchTab('project')" id="tabProject" class="flex-1 py-3 text-center transition flex items-center justify-center gap-1.5 tab-active">
+        🛠️ Project Info
+      </button>
+      <button onclick="switchTab('hardware')" id="tabHardware" class="flex-1 py-3 text-center text-gray-400 transition flex items-center justify-center gap-1.5">
+        ⚡ Hardware & Webview
+      </button>
+      <button onclick="switchTab('templates')" id="tabTemplates" class="flex-1 py-3 text-center text-gray-400 transition flex items-center justify-center gap-1.5">
+        📁 Templates
+      </button>
     </div>
 
-    <!-- Navigation Tabs -->
-    <div class="flex border-b border-gray-800 text-xs font-semibold mb-4">
-      <button id="navBuild" onclick="showTab('build')" class="flex-1 py-2 text-center tab-active">🛠 Project Info</button>
-      <button id="navFeatures" onclick="showTab('features')" class="flex-1 py-2 text-center text-gray-400">⚡ Hardware & Webview</button>
-      <button id="navTemplates" onclick="showTab('templates')" class="flex-1 py-2 text-center text-gray-400">📂 Templates</button>
-    </div>
-
-    <!-- TAB 1: BUILD FORM -->
-    <div id="buildTabSection" class="space-y-4">
-      <div class="card p-4 rounded-2xl shadow-xl space-y-3.5">
+    <!-- MAIN FORM -->
+    <div class="glass-card p-5 sm:p-6 space-y-5">
+      
+      <!-- TAB 1: PROJECT INFO -->
+      <div id="sectionProject" class="space-y-4">
         
-        <!-- App Name & Icon -->
-        <div class="flex gap-3 items-center">
-          <div class="relative w-16 h-16 rounded-2xl border border-dashed border-gray-600 flex flex-col items-center justify-center bg-black/40 overflow-hidden cursor-pointer" onclick="document.getElementById('iconInput').click()">
-            <img id="iconPreview" class="hidden w-full h-full object-cover">
-            <span id="iconPlaceholder" class="text-[10px] text-gray-400 text-center px-1">Upload Icon</span>
-            <input type="file" id="iconInput" accept="image/*" class="hidden" onchange="previewIcon(event)">
-          </div>
+        <!-- Icon & App Name -->
+        <div class="flex gap-4 items-center">
+          <label class="w-20 h-20 rounded-2xl border border-dashed border-gray-700 bg-black/40 flex flex-col items-center justify-center text-[10px] text-gray-400 cursor-pointer hover:border-sky-500 transition shrink-0 text-center px-1">
+            <span class="text-base mb-1">🖼️</span>
+            <span>Upload Icon</span>
+            <input type="file" id="iconFile" accept="image/*" class="hidden">
+          </label>
           <div class="flex-1">
-            <label class="text-xs font-semibold text-gray-300 block mb-1">App Name *</label>
-            <input id="appName" type="text" placeholder="My Awesome App" value="My App" 
-                   oninput="updatePackageName()" class="input-field w-full rounded-xl px-3.5 py-2 text-sm text-white">
+            <label class="block text-xs font-semibold text-gray-300 mb-1">App Name *</label>
+            <input id="appName" type="text" value="My Awesome App" class="w-full bg-black/50 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white focus:border-sky-500 outline-none">
           </div>
         </div>
 
-        <!-- Output Format Selector -->
+        <!-- Build Target Output -->
         <div>
-          <label class="text-xs font-semibold text-gray-300 block mb-1">Build Target Output *</label>
-          <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-            <button id="btnFmtApk" type="button" onclick="switchFormat('apk')" class="py-2.5 rounded-xl bg-sky-500 text-black">Standalone APK (Direct Install)</button>
-            <button id="btnFmtAab" type="button" onclick="switchFormat('aab')" class="py-2.5 rounded-xl bg-gray-800 text-gray-400">Play Store Bundle (.AAB)</button>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Build Target Output *</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="targetApk" onclick="setTarget('apk')" class="py-2.5 text-xs font-bold rounded-xl border border-gray-800 bg-sky-600 text-white btn-selected">
+              Standalone APK
+            </button>
+            <button type="button" id="targetAab" onclick="setTarget('aab')" class="py-2.5 text-xs font-bold rounded-xl border border-gray-800 bg-black/40 text-gray-400">
+              Play Store Bundle (.AAB)
+            </button>
           </div>
-          <span id="formatDescription" class="text-[10px] text-gray-400 mt-1 block">Full Standalone Android APK binary (~20MB - 30MB).</span>
+          <p class="text-[10px] text-gray-500 mt-1">Full APK binary with pre-compiled Android native shell.</p>
         </div>
 
         <!-- Package Name -->
         <div>
-          <label class="text-xs font-semibold text-gray-300 block mb-0.5">Package Name</label>
-          <input id="packageName" type="text" value="com.droidforge.myapp" 
-                 class="input-field w-full rounded-xl px-3.5 py-2 text-xs font-mono text-sky-400">
-          <span class="text-[10px] text-gray-500">Play Store unique ID (e.g. com.yourcompany.app)</span>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Package Name *</label>
+          <input id="packageId" type="text" value="com.droidforge.myawesomeapp" class="w-full bg-black/50 border border-gray-800 rounded-xl px-4 py-2.5 text-xs font-mono text-white focus:border-sky-500 outline-none">
+          <p class="text-[10px] text-gray-500 mt-1">Android Application ID (e.g. com.company.app)</p>
         </div>
 
-        <!-- Versioning Grid -->
-        <div class="grid grid-cols-2 gap-2">
+        <!-- Version Inputs -->
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="text-[11px] font-semibold text-gray-400 block mb-0.5">Version Code</label>
-            <input id="versionCode" type="number" value="1" class="input-field w-full rounded-xl px-3 py-1.5 text-xs text-white">
-          </div>
-          <div>
-            <label class="text-[11px] font-semibold text-gray-400 block mb-0.5">Version Name</label>
-            <input id="versionName" type="text" value="1.0" class="input-field w-full rounded-xl px-3 py-1.5 text-xs text-white">
-          </div>
-        </div>
-
-        <!-- SDK Compatibility -->
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="text-[11px] font-semibold text-gray-400 block mb-0.5">Min SDK (Android 7.0+)</label>
-            <input id="minSdk" type="number" value="24" class="input-field w-full rounded-xl px-3 py-1.5 text-xs text-white">
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Version Code</label>
+            <input id="versionCode" type="number" value="1" class="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white outline-none">
           </div>
           <div>
-            <label class="text-[11px] font-semibold text-gray-400 block mb-0.5">Target SDK (Android 16)</label>
-            <input id="targetSdk" type="number" value="36" class="input-field w-full rounded-xl px-3 py-1.5 text-xs text-white">
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Version Name</label>
+            <input id="versionName" type="text" value="1.0" class="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white outline-none">
           </div>
         </div>
 
-        <!-- Content Source Selector -->
-        <div class="pt-2 border-t border-gray-800">
-          <label class="text-xs font-semibold text-gray-300 block mb-1">Content Source *</label>
-          <div class="grid grid-cols-2 gap-2 text-xs font-semibold mb-2">
-            <button id="btnUrl" type="button" onclick="switchSourceMode('url')" class="py-2 rounded-xl bg-sky-500 text-black">Website URL</button>
-            <button id="btnHtml" type="button" onclick="switchSourceMode('html')" class="py-2 rounded-xl bg-gray-800 text-gray-400">HTML File / Code</button>
+        <!-- SDK Levels -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Min SDK (Android 7.0+)</label>
+            <input id="minSdk" type="number" value="24" class="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white outline-none">
           </div>
-
-          <div id="urlInputSection">
-            <input id="webUrl" type="url" placeholder="https://example.com" value="https://google.com" 
-                   class="input-field w-full rounded-xl px-3.5 py-2 text-sm text-white">
-          </div>
-
-          <div id="htmlInputSection" class="hidden">
-            <textarea id="htmlCode" rows="4" placeholder="<!DOCTYPE html><html><body><h1>Hello World</h1></body></html>" 
-                      class="input-field w-full rounded-xl p-3 text-xs font-mono text-white"></textarea>
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Target SDK (Android 14+)</label>
+            <input id="targetSdk" type="number" value="34" class="w-full bg-black/50 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white outline-none">
           </div>
         </div>
 
-        <!-- Monetization / AdMob Section -->
-        <div class="border-t border-gray-800 pt-2">
-          <div class="flex justify-between items-center cursor-pointer" onclick="toggleSection('admobSection', 'admobArrow')">
-            <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-              💰 Monetization / AdMob (100% User Revenue)
-            </span>
-            <span id="admobArrow" class="text-xs text-gray-400">▼</span>
-          </div>
-          
-          <div id="admobSection" class="hidden mt-3 space-y-2 bg-black/40 p-3 rounded-xl border border-gray-800">
-            <div>
-              <label class="text-[10px] text-gray-400 block">AdMob App ID</label>
-              <input id="admobAppId" type="text" placeholder="ca-app-pub-xxxxxxxx~yyyyyyyy" class="input-field w-full rounded-lg px-2.5 py-1.5 text-xs text-white">
-            </div>
-            <div>
-              <label class="text-[10px] text-gray-400 block">Banner Ad Unit ID</label>
-              <input id="admobBannerId" type="text" placeholder="ca-app-pub-xxxxxxxx/zzzzzzzz" class="input-field w-full rounded-lg px-2.5 py-1.5 text-xs text-white">
-            </div>
-          </div>
-        </div>
-
-        <!-- Build Button -->
-        <button onclick="startRealCloudBuild()" class="w-full bg-sky-400 hover:bg-sky-300 text-black font-black py-3.5 rounded-xl transition shadow-lg text-sm mt-3">
-          🚀 Build Real Android Package (100% Free)
-        </button>
-      </div>
-    </div>
-
-    <!-- TAB 2: HARDWARE & WEBVIEW -->
-    <div id="featuresTabSection" class="hidden space-y-4">
-      <div class="card p-4 rounded-2xl shadow-xl space-y-4">
-        <h2 class="text-xs font-bold text-sky-400 uppercase tracking-wider">Device Hardware Permissions</h2>
-        <div class="space-y-3 text-xs">
-          <label class="flex items-center justify-between cursor-pointer">
-            <span>📷 Camera & QR Scanner</span>
-            <input type="checkbox" checked class="accent-sky-400 w-4 h-4">
-          </label>
-          <label class="flex items-center justify-between cursor-pointer">
-            <span>🎤 Microphone (Audio Input)</span>
-            <input type="checkbox" class="accent-sky-400 w-4 h-4">
-          </label>
-          <label class="flex items-center justify-between cursor-pointer">
-            <span>📍 Geolocation (GPS Navigation)</span>
-            <input type="checkbox" checked class="accent-sky-400 w-4 h-4">
-          </label>
-          <label class="flex items-center justify-between cursor-pointer">
-            <span>💾 Storage (Download & Upload)</span>
-            <input type="checkbox" checked class="accent-sky-400 w-4 h-4">
-          </label>
-        </div>
-
-        <div class="pt-3 border-t border-gray-800 space-y-3">
-          <h2 class="text-xs font-bold text-sky-400 uppercase tracking-wider">Engine Customization</h2>
-          <label class="flex items-center justify-between cursor-pointer text-xs">
-            <span>🔄 Swipe Pull-to-Refresh</span>
-            <input type="checkbox" checked class="accent-sky-400 w-4 h-4">
-          </label>
-          <label class="flex items-center justify-between cursor-pointer text-xs">
-            <span>🚀 Splash Screen Preloader</span>
-            <input type="checkbox" checked class="accent-sky-400 w-4 h-4">
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 3: TEMPLATES -->
-    <div id="templatesTabSection" class="hidden space-y-3">
-      <div onclick="applyTemplate('ecommerce')" class="card p-3 rounded-xl flex items-center gap-3 cursor-pointer hover:border-sky-500 transition">
-        <div class="p-2 rounded-lg bg-pink-500/20 text-pink-400 text-lg">🛒</div>
+        <!-- Content Source -->
         <div>
-          <h3 class="text-xs font-bold text-white">E-Commerce Web-Shell</h3>
-          <p class="text-[10px] text-gray-400">Shopping layout with cart and checkout integration.</p>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Content Source *</label>
+          <div class="grid grid-cols-2 gap-2 mb-2">
+            <button type="button" id="srcBtnUrl" onclick="setSource('url')" class="py-2 text-xs font-bold rounded-xl border border-gray-800 btn-selected">Website URL</button>
+            <button type="button" id="srcBtnHtml" onclick="setSource('html')" class="py-2 text-xs font-bold rounded-xl border border-gray-800 bg-black/40 text-gray-400">HTML File / Code</button>
+          </div>
+          <div id="urlBox">
+            <input id="webUrl" type="url" value="https://google.com" placeholder="https://" class="w-full bg-black/50 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white focus:border-sky-500 outline-none">
+          </div>
+          <div id="htmlBox" class="hidden">
+            <textarea id="htmlCode" rows="5" placeholder="<html><body><h1>Hello World</h1></body></html>" class="w-full bg-black/50 border border-gray-800 rounded-xl p-3 text-xs font-mono text-emerald-400 outline-none"></textarea>
+          </div>
         </div>
-      </div>
-      <div onclick="applyTemplate('interaction')" class="card p-3 rounded-xl flex items-center gap-3 cursor-pointer hover:border-sky-500 transition">
-        <div class="p-2 rounded-lg bg-emerald-500/20 text-emerald-400 text-lg">🔔</div>
-        <div>
-          <h3 class="text-xs font-bold text-white">Native Interaction Demo</h3>
-          <p class="text-[10px] text-gray-400">Vibration feedback, alerts, and system triggers.</p>
-        </div>
-      </div>
-      <div onclick="applyTemplate('dashboard')" class="card p-3 rounded-xl flex items-center gap-3 cursor-pointer hover:border-sky-500 transition">
-        <div class="p-2 rounded-lg bg-amber-500/20 text-amber-400 text-lg">📊</div>
-        <div>
-          <h3 class="text-xs font-bold text-white">Analytics Dashboard</h3>
-          <p class="text-[10px] text-gray-400">Card components with metrics and dark UI.</p>
-        </div>
-      </div>
-    </div>
 
-    <!-- Process & Download Card -->
-    <div id="statusCard" class="hidden mt-4 card p-5 rounded-2xl text-center space-y-4">
-      <div class="w-full h-36 bg-gray-900 border border-dashed border-emerald-500/40 rounded-xl flex flex-col items-center justify-center p-3 text-center">
-        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Sponsored Advertisement</span>
-        <p class="text-xs text-gray-300 font-semibold mt-1">High-Revenue 300x250 Medium Rectangle Ad</p>
-        <span class="text-[10px] text-gray-500 mt-0.5">Displays throughout compiling duration</span>
+        <!-- Monetization Accordion -->
+        <div class="border border-gray-800 rounded-xl p-3 bg-black/20">
+          <button type="button" onclick="toggleAdmob()" class="w-full flex items-center justify-between text-xs font-semibold text-amber-400">
+            <span>💰 Monetization / AdMob (Optional)</span>
+            <span id="admobArrow">▼</span>
+          </button>
+          <div id="admobFields" class="hidden mt-3 space-y-2">
+            <input id="admobAppId" type="text" placeholder="AdMob App ID (ca-app-pub-...)" class="w-full bg-black/60 border border-gray-800 rounded-lg px-3 py-2 text-xs text-white outline-none">
+            <input id="admobBannerId" type="text" placeholder="Banner Ad Unit ID" class="w-full bg-black/60 border border-gray-800 rounded-lg px-3 py-2 text-xs text-white outline-none">
+          </div>
+        </div>
+
       </div>
 
-      <div id="progressSection" class="space-y-2">
-        <div class="flex justify-between items-center text-xs">
-          <span id="buildStatusText" class="font-semibold text-sky-400">Triggering GitHub Actions Compiler...</span>
-          <span id="percentageText" class="font-bold text-white text-sm">0%</span>
+      <!-- TAB 2: HARDWARE & WEBVIEW -->
+      <div id="sectionHardware" class="hidden space-y-4">
+        <div>
+          <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">Device Hardware Permissions</h3>
+          <div class="space-y-2 text-xs text-gray-300">
+            <label class="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-gray-800/80">
+              <span>📷 Camera & QR Scanner</span>
+              <input type="checkbox" id="permCamera" checked class="w-4 h-4 rounded text-sky-500">
+            </label>
+            <label class="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-gray-800/80">
+              <span>🎤 Microphone (Audio Input)</span>
+              <input type="checkbox" id="permMic" class="w-4 h-4 rounded text-sky-500">
+            </label>
+            <label class="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-gray-800/80">
+              <span>📍 Geolocation (GPS Navigation)</span>
+              <input type="checkbox" id="permGps" checked class="w-4 h-4 rounded text-sky-500">
+            </label>
+            <label class="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-gray-800/80">
+              <span>💾 Storage (Download & File Upload)</span>
+              <input type="checkbox" id="permStorage" checked class="w-4 h-4 rounded text-sky-500">
+            </label>
+            <label class="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-gray-800/80">
+              <span>🔦 Flashlight & Haptic Vibration</span>
+              <input type="checkbox" id="permVibrate" class="w-4 h-4 rounded text-sky-500">
+            </label>
+          </div>
         </div>
+
+        <div class="border-t border-gray-800 pt-3">
+          <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">Engine Customization</h3>
+          <div class="space-y-2 text-xs text-gray-300">
+            <label class="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-gray-800/80">
+              <span>🔄 Swipe Pull-to-Refresh</span>
+              <input type="checkbox" id="optRefresh" checked class="w-4 h-4 rounded text-sky-500">
+            </label>
+            <label class="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-gray-800/80">
+              <span>🚀 Splash Screen Preloader</span>
+              <input type="checkbox" id="optSplash" checked class="w-4 h-4 rounded text-sky-500">
+            </label>
+            <label class="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-gray-800/80">
+              <span>📦 Offline File Caching</span>
+              <input type="checkbox" id="optCache" checked class="w-4 h-4 rounded text-sky-500">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: TEMPLATES -->
+      <div id="sectionTemplates" class="hidden space-y-3">
+        <p class="text-[11px] text-gray-400">Click any preset template to auto-fill the project:</p>
         
-        <div class="w-full bg-gray-800 rounded-full h-3.5 p-0.5 border border-gray-700 overflow-hidden">
-          <div id="progressBar" class="bg-gradient-to-r from-sky-500 via-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+        <div onclick="applyTemplate('ecommerce')" class="p-3.5 rounded-2xl bg-black/40 border border-gray-800 hover:border-purple-500 transition cursor-pointer flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg">🛒</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">E-Commerce Web-Shell</h4>
+            <p class="text-[10px] text-gray-400">Shopping layout with cart and checkout integration.</p>
+          </div>
         </div>
 
-        <p id="subStatusText" class="text-[11px] text-gray-400">Initializing Ubuntu Cloud Runner & Android SDK...</p>
+        <div onclick="applyTemplate('native')" class="p-3.5 rounded-2xl bg-black/40 border border-gray-800 hover:border-emerald-500 transition cursor-pointer flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">🔔</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Native Interaction Demo</h4>
+            <p class="text-[10px] text-gray-400">Vibration feedback, alerts, and system triggers.</p>
+          </div>
+        </div>
+
+        <div onclick="applyTemplate('video')" class="p-3.5 rounded-2xl bg-black/40 border border-gray-800 hover:border-indigo-500 transition cursor-pointer flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg">🎬</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Video & Media Player</h4>
+            <p class="text-[10px] text-gray-400">Hardware accelerated streaming audio/video.</p>
+          </div>
+        </div>
+
+        <div onclick="applyTemplate('analytics')" class="p-3.5 rounded-2xl bg-black/40 border border-gray-800 hover:border-amber-500 transition cursor-pointer flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">📊</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Analytics Dashboard</h4>
+            <p class="text-[10px] text-gray-400">Real-time metrics, responsive charts, and dark theme.</p>
+          </div>
+        </div>
       </div>
 
-      <div id="downloadContainer" class="hidden space-y-2 pt-2 border-t border-gray-800">
-        <a id="packageDownloadLink" href="https://github.com/KAVIKING786/DroidForge/actions" target="_blank"
-           class="w-full flex items-center justify-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-black font-black py-3.5 rounded-xl transition shadow-lg text-sm">
-          <span id="downloadBtnText">⬇ Open Actions & Download Real APK (~20MB)</span>
-        </a>
-        <p class="text-[10px] text-gray-400">100% Real Binary compiled with Android SDK. Ready to install without parse error.</p>
+      <!-- Cloud Engine Token Input (Stored in browser) -->
+      <div class="border-t border-gray-800 pt-3">
+        <label class="block text-[11px] font-semibold text-gray-400 mb-1">GitHub Dispatch Key (One-time Setup)</label>
+        <input id="apiToken" type="password" placeholder="Paste ghp_xxxx token to automate" class="w-full bg-black/60 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none">
       </div>
+
+      <!-- MAIN ACTION BUTTON -->
+      <button id="buildBtn" onclick="startPackaging()" class="w-full bg-sky-500 hover:bg-sky-400 text-black font-extrabold py-3.5 rounded-xl shadow-lg shadow-sky-500/20 text-xs sm:text-sm flex items-center justify-center gap-2 transition">
+        <span>🚀 Build Real Clean Package (100% Free)</span>
+      </button>
+
+      <!-- PROGRESS & DOWNLOAD MODAL -->
+      <div id="buildOutput" class="hidden bg-black/70 border border-gray-800 rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between text-xs">
+          <span id="buildLabel" class="text-sky-400 font-semibold flex items-center gap-2">
+            <span class="animate-spin">⚙️</span> Compiling Android Native Binary...
+          </span>
+          <span id="buildTimer" class="text-gray-400 font-mono">0s</span>
+        </div>
+        <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+          <div id="buildBar" class="bg-sky-400 h-full w-1/4 transition-all duration-500"></div>
+        </div>
+        <div id="downloadContainer" class="hidden pt-2">
+          <a id="apkDownloadLink" href="#" target="_blank" class="w-full block text-center bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-3 rounded-xl text-xs sm:text-sm shadow-lg transition">
+            📥 Download Installable APK
+          </a>
+        </div>
+      </div>
+
     </div>
-  </div>
 
-  <!-- Bottom Sticky Banner Ad Space -->
-  <div class="fixed bottom-0 left-0 w-full bg-black/90 border-t border-gray-800 py-1.5 px-3 z-50 flex flex-col items-center justify-center">
-    <span class="text-[9px] text-gray-500 uppercase font-semibold">Sticky Footer Ad Space</span>
-    <span class="text-[11px] text-sky-400 font-bold">320x50 Mobile Leaderboard Banner</span>
+    <!-- Footer -->
+    <div class="text-center text-[10px] text-gray-500">
+      DroidForge Engine • 100% Free • Open Source Android Cloud Packaging
+    </div>
+
   </div>
 
   <script>
-    // GitHub API Settings (உங்களுடைய Token நேரடியாக இணைக்கப்பட்டுள்ளது)
-    const GITHUB_TOKEN = "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";
-    const GITHUB_REPO = "KAVIKING786/DroidForge";
+    const REPO_OWNER = 'KAVIKING786';
+    const REPO_NAME = 'DroidForge-apk-builder';
+    const WORKFLOW_ID = 'build-apk.yml';
 
-    let sourceMode = 'url';
-    let targetFormat = 'apk';
-    let iconBase64 = null;
+    let currentSource = 'url';
+    let currentTarget = 'apk';
 
-    function showTab(tab) {
-      document.getElementById('buildTabSection').classList.toggle('hidden', tab !== 'build');
-      document.getElementById('featuresTabSection').classList.toggle('hidden', tab !== 'features');
-      document.getElementById('templatesTabSection').classList.toggle('hidden', tab !== 'templates');
-      document.getElementById('navBuild').className = tab === 'build' ? "flex-1 py-2 text-center tab-active" : "flex-1 py-2 text-center text-gray-400";
-      document.getElementById('navFeatures').className = tab === 'features' ? "flex-1 py-2 text-center tab-active" : "flex-1 py-2 text-center text-gray-400";
-      document.getElementById('navTemplates').className = tab === 'templates' ? "flex-1 py-2 text-center tab-active" : "flex-1 py-2 text-center text-gray-400";
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedToken = localStorage.getItem('droidforge_token');
+      if (savedToken) document.getElementById('apiToken').value = savedToken;
+    });
+
+    function switchTab(tab) {
+      document.getElementById('sectionProject').classList.toggle('hidden', tab !== 'project');
+      document.getElementById('sectionHardware').classList.toggle('hidden', tab !== 'hardware');
+      document.getElementById('sectionTemplates').classList.toggle('hidden', tab !== 'templates');
+
+      document.getElementById('tabProject').className = `flex-1 py-3 text-center transition flex items-center justify-center gap-1.5 ${tab === 'project' ? 'tab-active' : 'text-gray-400'}`;
+      document.getElementById('tabHardware').className = `flex-1 py-3 text-center transition flex items-center justify-center gap-1.5 ${tab === 'hardware' ? 'tab-active' : 'text-gray-400'}`;
+      document.getElementById('tabTemplates').className = `flex-1 py-3 text-center transition flex items-center justify-center gap-1.5 ${tab === 'templates' ? 'tab-active' : 'text-gray-400'}`;
     }
 
-    function switchFormat(fmt) {
-      targetFormat = fmt;
-      const bApk = document.getElementById('btnFmtApk');
-      const bAab = document.getElementById('btnFmtAab');
-      const desc = document.getElementById('formatDescription');
-
-      if (fmt === 'apk') {
-        bApk.className = "py-2.5 rounded-xl bg-sky-500 text-black";
-        bAab.className = "py-2.5 rounded-xl bg-gray-800 text-gray-400";
-        desc.innerText = "Full Standalone Android APK binary (~20MB - 30MB).";
-      } else {
-        bAab.className = "py-2.5 rounded-xl bg-sky-500 text-black";
-        bApk.className = "py-2.5 rounded-xl bg-gray-800 text-gray-400";
-        desc.innerText = "Android App Bundle (.AAB) optimized for Google Play Console submission.";
-      }
+    function setTarget(type) {
+      currentTarget = type;
+      document.getElementById('targetApk').className = `py-2.5 text-xs font-bold rounded-xl border border-gray-800 ${type === 'apk' ? 'btn-selected' : 'bg-black/40 text-gray-400'}`;
+      document.getElementById('targetAab').className = `py-2.5 text-xs font-bold rounded-xl border border-gray-800 ${type === 'aab' ? 'btn-selected' : 'bg-black/40 text-gray-400'}`;
     }
 
-    function switchSourceMode(mode) {
-      sourceMode = mode;
-      const bUrl = document.getElementById('btnUrl');
-      const bHtml = document.getElementById('btnHtml');
-      const uSec = document.getElementById('urlInputSection');
-      const hSec = document.getElementById('htmlInputSection');
-
-      if (mode === 'url') {
-        bUrl.className = "py-2 rounded-xl bg-sky-500 text-black";
-        bHtml.className = "py-2 rounded-xl bg-gray-800 text-gray-400";
-        uSec.classList.remove('hidden');
-        hSec.classList.add('hidden');
-      } else {
-        bHtml.className = "py-2 rounded-xl bg-sky-500 text-black";
-        bUrl.className = "py-2 rounded-xl bg-gray-800 text-gray-400";
-        hSec.classList.remove('hidden');
-        uSec.classList.add('hidden');
-      }
+    function setSource(src) {
+      currentSource = src;
+      document.getElementById('urlBox').classList.toggle('hidden', src !== 'url');
+      document.getElementById('htmlBox').classList.toggle('hidden', src !== 'html');
+      document.getElementById('srcBtnUrl').className = `py-2 text-xs font-bold rounded-xl border border-gray-800 ${src === 'url' ? 'btn-selected' : 'bg-black/40 text-gray-400'}`;
+      document.getElementById('srcBtnHtml').className = `py-2 text-xs font-bold rounded-xl border border-gray-800 ${src === 'html' ? 'btn-selected' : 'bg-black/40 text-gray-400'}`;
     }
 
-    function toggleSection(secId, arrowId) {
-      const el = document.getElementById(secId);
-      const arr = document.getElementById(arrowId);
-      if (el.classList.contains('hidden')) {
-        el.classList.remove('hidden');
-        arr.innerText = '▲';
-      } else {
-        el.classList.add('hidden');
-        arr.innerText = '▼';
-      }
-    }
-
-    function updatePackageName() {
-      const name = document.getElementById('appName').value.trim();
-      const sanitized = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-      document.getElementById('packageName').value = `com.droidforge.${sanitized || 'app'}`;
-    }
-
-    function previewIcon(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          iconBase64 = evt.target.result;
-          const img = document.getElementById('iconPreview');
-          img.src = iconBase64;
-          img.classList.remove('hidden');
-          document.getElementById('iconPlaceholder').classList.add('hidden');
-        }
-        reader.readAsDataURL(file);
-      }
+    function toggleAdmob() {
+      const f = document.getElementById('admobFields');
+      const arrow = document.getElementById('admobArrow');
+      f.classList.toggle('hidden');
+      arrow.innerText = f.classList.contains('hidden') ? '▼' : '▲';
     }
 
     function applyTemplate(type) {
-      showTab('build');
-      switchSourceMode('html');
+      switchTab('project');
       if (type === 'ecommerce') {
-        document.getElementById('appName').value = "ShopDirect Store";
-        document.getElementById('htmlCode').value = "<!DOCTYPE html><html><body style='background:#0f172a;color:#fff;padding:20px;font-family:sans-serif;'><h2>ShopDirect Store</h2></body></html>";
-      } else if (type === 'interaction') {
-        document.getElementById('appName').value = "Interactive App";
-        document.getElementById('htmlCode').value = "<!DOCTYPE html><html><body style='background:#111;color:#fff;text-align:center;padding:50px;'><h2>Interaction Demo</h2></body></html>";
-      } else if (type === 'dashboard') {
-        document.getElementById('appName').value = "Analytics App";
-        document.getElementById('htmlCode').value = "<!DOCTYPE html><html><body style='background:#090d16;color:#e2e8f0;padding:20px;font-family:sans-serif;'><h3>Analytics</h3></body></html>";
+        document.getElementById('appName').value = 'ShopEase Store';
+        document.getElementById('packageId').value = 'com.shopease.app';
+        setSource('url');
+        document.getElementById('webUrl').value = 'https://amazon.in';
+      } else if (type === 'video') {
+        document.getElementById('appName').value = 'StreamBox Media';
+        document.getElementById('packageId').value = 'com.streambox.player';
+        setSource('html');
+        document.getElementById('htmlCode').value = `<!DOCTYPE html><html><body style="background:#000;color:#fff;text-align:center;padding-top:20%"><video controls autoplay width="90%"><source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4"></video></body></html>`;
+      } else if (type === 'analytics') {
+        document.getElementById('appName').value = 'Insight Dashboard';
+        document.getElementById('packageId').value = 'com.insight.metrics';
+        setSource('url');
+        document.getElementById('webUrl').value = 'https://analytics.google.com';
+      } else if (type === 'native') {
+        document.getElementById('appName').value = 'Native Trigger';
+        document.getElementById('packageId').value = 'com.native.demo';
+        setSource('html');
+        document.getElementById('htmlCode').value = `<!DOCTYPE html><html><body style="background:#111;color:#fff;text-align:center;padding:50px"><button onclick="navigator.vibrate(200)" style="padding:15px;background:#0284c7;color:#fff;border-radius:10px">Vibrate Device</button></body></html>`;
       }
-      updatePackageName();
     }
 
-    async function startRealCloudBuild() {
-      const rawName = document.getElementById('appName').value.trim() || "My_App";
-      const sanitizedName = rawName.replace(/[^a-zA-Z0-9]/g, "_");
-      const targetUrl = document.getElementById('webUrl').value.trim() || "https://google.com";
+    async function startPackaging() {
+      const appName = document.getElementById('appName').value.trim() || 'My App';
+      const packageId = document.getElementById('packageId').value.trim() || 'com.droidforge.app';
+      const webUrl = document.getElementById('webUrl').value.trim();
+      const htmlCode = document.getElementById('htmlCode').value;
+      const token = document.getElementById('apiToken').value.trim();
 
-      const statusCard = document.getElementById('statusCard');
-      const downloadContainer = document.getElementById('downloadContainer');
-      const progressBar = document.getElementById('progressBar');
-      const percentageText = document.getElementById('percentageText');
-      const buildStatusText = document.getElementById('buildStatusText');
-      const subStatusText = document.getElementById('subStatusText');
-      const downloadBtnText = document.getElementById('downloadBtnText');
+      if (!token) {
+        alert("Please enter the GitHub Token once to run the cloud compiler!");
+        return;
+      }
+      localStorage.setItem('droidforge_token', token);
 
-      statusCard.classList.remove('hidden');
-      downloadContainer.classList.add('hidden');
-      statusCard.scrollIntoView({ behavior: 'smooth' });
+      const out = document.getElementById('buildOutput');
+      const label = document.getElementById('buildLabel');
+      const timer = document.getElementById('buildTimer');
+      const bar = document.getElementById('buildBar');
+      const dCont = document.getElementById('downloadContainer');
+      const dLink = document.getElementById('apkDownloadLink');
+      const buildBtn = document.getElementById('buildBtn');
 
-      // 1. Trigger GitHub Actions Dispatch API
+      out.classList.remove('hidden');
+      dCont.classList.add('hidden');
+      buildBtn.disabled = true;
+      buildBtn.classList.add('opacity-50');
+
+      label.innerHTML = '<span class="animate-spin">⚙️</span> Sending task to Cloud Engine...';
+      bar.style.width = '30%';
+
       try {
-        buildStatusText.innerText = "Dispatching command to GitHub Actions...";
-        await fetch(`https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/build-apk.yml/dispatches`, {
-          method: "POST",
+        const resp = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_ID}/dispatches`, {
+          method: 'POST',
           headers: {
-            "Accept": "application/vnd.github+json",
-            "Authorization": `Bearer ${GITHUB_TOKEN}`
+            'Accept': 'application/vnd.github+json',
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            ref: "main",
+            ref: 'main',
             inputs: {
-              app_name: sanitizedName,
-              web_url: targetUrl
+              app_name: appName,
+              package_id: packageId,
+              source_type: currentSource,
+              web_url: webUrl,
+              html_content: currentSource === 'html' ? htmlCode : ''
             }
           })
         });
-      } catch (err) {
-        console.error(err);
-      }
 
-      // 2. Realistic Progress Tracking (80 Seconds Cloud Compilation Time)
-      let progress = 0;
-      progressBar.style.width = '0%';
-      percentageText.innerText = '0%';
+        if (!resp.ok) throw new Error("Could not start workflow. Check token scope.");
 
-      const steps = [
-        { at: 15, title: "Connecting to Cloud Ubuntu Runner...", desc: "Allocating Android SDK and Gradle build cache." },
-        { at: 35, title: "Configuring Java JDK 17 & Environment...", desc: "Writing AndroidManifest.xml and Webview core." },
-        { at: 60, title: "Compiling Native Bytecode & Dex...", desc: "Packaging classes.dex into 20MB+ Android structure." },
-        { at: 80, title: "Running Gradle assembleDebug...", desc: "Executing apksigner v2 cryptographic signatures." },
-        { at: 95, title: "Finalizing APK Artifact...", desc: "Zipalign optimization for error-free mobile installation." }
-      ];
+        label.innerHTML = '<span class="animate-spin">🔄</span> Building Real APK (~2 mins)...';
+        bar.style.width = '60%';
 
-      const interval = setInterval(() => {
-        progress += 1;
-        progressBar.style.width = `${progress}%`;
-        percentageText.innerText = `${progress}%`;
+        let count = 0;
+        const iv = setInterval(async () => {
+          count += 5;
+          timer.innerText = `${count}s`;
 
-        for (let s of steps) {
-          if (progress === s.at) {
-            buildStatusText.innerText = s.title;
-            subStatusText.innerText = s.desc;
+          try {
+            const aRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/artifacts`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (aRes.ok) {
+              const data = await aRes.json();
+              if (data.artifacts && data.artifacts.length > 0) {
+                const art = data.artifacts[0];
+                const dt = new Date(art.created_at);
+                if ((new Date() - dt) < 200000) {
+                  clearInterval(iv);
+                  bar.style.width = '100%';
+                  label.innerHTML = '✅ Compilation Succeeded!';
+                  dLink.href = art.archive_download_url;
+                  dLink.innerText = `📥 Download Clean APK (${(art.size_in_bytes / (1024*1024)).toFixed(1)} MB)`;
+                  dCont.classList.remove('hidden');
+                  buildBtn.disabled = false;
+                  buildBtn.classList.remove('opacity-50');
+                  return;
+                }
+              }
+            }
+          } catch(e) {}
+
+          if (count > 180) {
+            clearInterval(iv);
+            dLink.href = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions`;
+            dLink.innerText = '📥 Open GitHub Actions Download Page';
+            dCont.classList.remove('hidden');
+            buildBtn.disabled = false;
+            buildBtn.classList.remove('opacity-50');
           }
-        }
+        }, 5000);
 
-        if (progress >= 100) {
-          clearInterval(interval);
-          buildStatusText.innerText = "Build Completed Successfully in Cloud!";
-          subStatusText.innerText = "Real Android binary is generated by Android SDK.";
-          downloadBtnText.innerText = `⬇ Open Actions & Download ${sanitizedName}.apk (~20MB)`;
-          downloadContainer.classList.remove('hidden');
-        }
-      }, 800);
+      } catch (err) {
+        alert(err.message);
+        out.classList.add('hidden');
+        buildBtn.disabled = false;
+        buildBtn.classList.remove('opacity-50');
+      }
     }
   </script>
 </body>
