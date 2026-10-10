@@ -37,8 +37,8 @@ jobs:
           cd myApp
           cordova platform add android
 
-          if [ "${{ github.event.inputs.source_type }}" = "html" ] && [ -n "${{ github.event.inputs.html_content }}" ]; then
-            printf "%s" "${{ github.event.inputs.html_content }}" > www/index.html
+                    if [ "${{ github.event.inputs.source_type }}" = "html" ]; then
+            echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html
           else
             cat << 'EOF' > www/index.html
             <!DOCTYPE html>
@@ -62,8 +62,11 @@ jobs:
           cd myApp
           cordova build android --debug
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+            - name: Publish Direct Public Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: Real-Installable-APK
-          path: myApp/platforms/android/app/build/outputs/apk/debug/*.apk
+          tag_name: latest-build
+          name: "Direct APK Build"
+          files: myApp/platforms/android/app/build/outputs/apk/debug/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
