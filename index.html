@@ -389,9 +389,25 @@
                   clearInterval(iv);
                   bar.style.width = '100%';
                   label.innerHTML = '✅ Compilation Succeeded!';
-                  dLink.href = art.archive_download_url;
-                  dLink.innerText = "📥 Download Clean APK";
-                  dLink.removeAttribute("download");
+                            dLink.href = "#";
+          dLink.innerText = "📥 Download Clean APK";
+          dLink.onclick = async (e) => {
+            e.preventDefault();
+            dLink.innerText = "⏳ Downloading...";
+            const blobRes = await fetch(art.archive_download_url, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const blob = await blobRes.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${appName || 'app'}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+            dLink.innerText = "✅ Download Complete!";
+          };
                   dCont.classList.remove('hidden');
                   buildBtn.disabled = false;
                   buildBtn.classList.remove('opacity-50');
