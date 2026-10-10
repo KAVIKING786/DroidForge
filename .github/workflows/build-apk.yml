@@ -42,8 +42,8 @@ jobs:
           cordova plugin add cordova-plugin-whitelist
           cordova plugin add cordova-plugin-android-permissions
          
-                                        if [ "${{ github.event.inputs.source_type }}" = "html" ]; then
-            python3 -c "import base64; open('www/index.html', 'wb').write(base64.b64decode('${{ github.event.inputs.html_content }}'))"
+            if [ "${{ github.event.inputs.source_type }}" = "html" ]; then
+            echo '${{ github.event.inputs.html_content }}' | base64 -d > www/index.html
           else
             cat << 'EOF' > www/index.html
             <!DOCTYPE html>
