@@ -39,7 +39,9 @@ jobs:
           cordova create myApp ${{ github.event.inputs.package_id }} "${{ github.event.inputs.app_name }}"
           cd myApp
           cordova platform add android
-
+          cordova plugin add cordova-plugin-whitelist
+          cordova plugin add cordova-plugin-android-permissions
+         
                                         if [ "${{ github.event.inputs.source_type }}" = "html" ]; then
             python3 -c "import base64; open('www/index.html', 'wb').write(base64.b64decode('${{ github.event.inputs.html_content }}'))"
           else
