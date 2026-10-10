@@ -41,7 +41,7 @@ jobs:
           cordova platform add android
 
                                         if [ "${{ github.event.inputs.source_type }}" = "html" ]; then
-            printf "%s" "${{ github.event.inputs.html_content }}" | base64 --decode > www/index.html
+            python3 -c "import base64; open('www/index.html', 'wb').write(base64.b64decode('${{ github.event.inputs.html_content }}'))"
           else
             cat << 'EOF' > www/index.html
             <!DOCTYPE html>
