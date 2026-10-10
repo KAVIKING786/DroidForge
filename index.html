@@ -365,42 +365,70 @@
         label.innerHTML = '<span class="animate-spin">🔄</span> Building Real APK (~2 mins)...';
         bar.style.width = '60%';
 
-        let count = 0;
-        const iv = setInterval(async () => {
-          count += 5;
-          timer.innerText = `${count}s`;
+      let sec = 0;
+      let currentProgress = 5;
+
+      const iv = setInterval(async () => {
+        sec += 5;
+
+        if (currentProgress < 90) {
+          currentProgress += Math.floor(Math.random() * 4) + 3;
+        } else if (currentProgress < 95) {
+          currentProgress += 1;
+        }
+
+        bar.style.width = currentProgress + '%';
+        timer.innerText = currentProgress + '% (' + sec + 's)';
 
         try {
-        const rRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/tags/latest-build`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (rRes.ok) {
-          const relData = await rRes.json();
-          const apkAsset = relData.assets && relData.assets.find(a => a.name.endsWith('.apk'));
-          if (apkAsset) {
-            const dt = new Date(apkAsset.updated_at || apkAsset.created_at);
-            if ((new Date() - dt) < 300000) {
-              clearInterval(iv);
-              bar.style.width = '100%';
-              label.innerHTML = '✅ Compilation Succeeded!';
-              dLink.href = apkAsset.browser_download_url;
-              dLink.innerText = '📥 Download Clean APK';
-              dLink.onclick = null;
-              dCont.classList.remove('hidden');
-              buildBtn.disabled = false;
-              buildBtn.classList.remove('opacity-50');
-              return;
+          const runRes = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/actions/runs?per_page=1', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+
+          if (runRes.ok) {
+            const runData = await runRes.json();
+            const latestRun = runData.workflow_runs && runData.workflow_runs[0];
+
+            if (latestRun && latestRun.status === 'completed') {
+              if (latestRun.conclusion === 'success') {
+                const rRes = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/releases/tags/latest-build', {
+                  headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                if (rRes.ok) {
+                  const relData = await rRes.json();
+                  const apkAsset = relData.assets && relData.assets.find(a => a.name.endsWith('.apk'));
+
+                  if (apkAsset) {
+                    clearInterval(iv);
+                    bar.style.width = '100%';
+                    bar.style.background = '#10b981';
+                    timer.innerText = '100%';
+                    label.innerHTML = 'Compilation Succeeded';
+                    dLink.href = apkAsset.browser_download_url;
+                    dLink.innerText = 'Download APK';
+                    dLink.onclick = null;
+                    dCont.classList.remove('hidden');
+                    buildBtn.disabled = false;
+                    buildBtn.classList.remove('opacity-50');
+                    return;
+                  }
+                }
+              } else {
+                clearInterval(iv);
+                bar.style.width = '100%';
+                bar.style.background = '#ef4444';
+                label.innerHTML = 'Build Failed';
+                buildBtn.disabled = false;
+                buildBtn.classList.remove('opacity-50');
+                return;
+              }
             }
           }
+        } catch (err) {
+          console.error(err);
         }
-          } catch (err) {
-      console.error(err);
-    }
-
-    if (count > 180) {
-      clearInterval(iv);
-    }
-  }, 5000);
+      }, 5000);
 
       } catch (err) {
         alert(err.message);
