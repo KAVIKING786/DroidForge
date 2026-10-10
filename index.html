@@ -389,8 +389,9 @@
                   clearInterval(iv);
                   bar.style.width = '100%';
                   label.innerHTML = '✅ Compilation Succeeded!';
-                  dLink.href = art.archive_download_url;
-                  dLink.innerText = `📥 Download Clean APK (${(art.size_in_bytes / (1024*1024)).toFixed(1)} MB)`;
+                  dLink.href = `https://github.com/KAVIKING786/DroidForge/releases/download/latest-build/app-release.apk?t=${Date.now()}`;
+                  dLink.innerText = "📥 Download Clean APK";
+                  dLink.setAttribute("download", "app-release.apk");
                   dCont.classList.remove('hidden');
                   buildBtn.disabled = false;
                   buildBtn.classList.remove('opacity-50');
@@ -402,9 +403,8 @@
 
           if (count > 180) {
             clearInterval(iv);
-            dLink.href = `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions`;
-            dLink.innerText = '📥 Open GitHub Actions Download Page';
-            dCont.classList.remove('hidden');
+            dLink.href = `https://github.com/KAVIKING786/DroidForge/releases/download/latest-build/app-release.apk?t=${Date.now()}`;
+            dLink.innerText = "📥 Download Clean APK";
             buildBtn.disabled = false;
             buildBtn.classList.remove('opacity-50');
           }
