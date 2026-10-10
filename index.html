@@ -361,7 +361,7 @@
               package_id: packageId,
               source_type: currentSource,
               web_url: webUrl,
-              html_content: currentSource === 'html' ? htmlCode : ''
+              html_content: currentSource === 'html' ? btoa(unescape(encodeURIComponent(htmlCode))) : ''
             }
           })
         });
