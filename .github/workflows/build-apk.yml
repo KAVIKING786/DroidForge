@@ -27,9 +27,11 @@ on:
 jobs:
   build-apk:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     container:
       image: beevelop/cordova:latest
-
+      
     steps:
       - name: Create App Project
         run: |
@@ -55,14 +57,14 @@ jobs:
             </body>
             </html>
           EOF
-          fi
+                    fi
 
       - name: Build APK File
         run: |
           cd myApp
           cordova build android --debug
 
-            - name: Publish Direct Public Release
+      - name: Publish Direct Public Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest-build
