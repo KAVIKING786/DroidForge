@@ -474,7 +474,7 @@
 
             const runStartTime = new Date(latestRun?.created_at).getTime();
             
-            if (latestRun && runStartTime >= (triggerTime - 60000) && latestRun.status === 'completed' && latestRun.conclusion === 'success') {
+            if (latestRun && latestRun.status === 'completed' && latestRun.conclusion === 'success') {
               
               const relCheck = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest`);
               if (relCheck.ok) {
@@ -495,7 +495,7 @@
                   return;
                 }
               }
-            } else if (latestRun && runStartTime >= (triggerTime - 60000) && latestRun.status === 'completed' && latestRun.conclusion !== 'success') {
+            } else if (latestRun && latestRun.status === 'completed' && latestRun.conclusion !== 'success') {
               clearInterval(timer);
               pBar.style.width = '100%';
               pBar.style.background = '#ef4444';
