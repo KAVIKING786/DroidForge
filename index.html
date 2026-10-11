@@ -348,12 +348,8 @@
   </div>
 
   <script>
-    // GitHub Repo Settings
-    const REPO_OWNER = 'KAVIKING786';
-    const REPO_NAME = 'DroidForge';
-
-    // GitHub Access Token
-    const AUTH_KEY = ["ghp", "ioy0QDj3vRdq6BQokXyZbrNZJCP8rD2BL31u"].join("_");
+    // Google Apps Script Proxy URL
+   const PROXY_URL = "https://script.google.com/macros/s/AKfycbxcM3KLPmvZk6KjMf9zKfqtv1r5pYg69n3GfT6mf4Wg54IoxlAeCW7c2yuOU9TOWMAW5A/exec";
 
     let currentSource = 'code';
      
@@ -441,24 +437,23 @@
       pBar.style.background = '#0284c7';
 
       try {
-        const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/build-apk.yml/dispatches`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${AUTH_KEY}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            ref: 'main',
-            inputs: {
-              app_name: appName,
-              package_id: packageId,
-              html_content: encodedCode
-            }
-          })
-        });
+     const res = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify({
+        ref: 'main',
+        inputs: {
+          app_name: appName,
+          package_id: packageId,
+          html_content: encodedCode
+        }
+      })
+    });
 
-        if (!res.ok) throw new Error('Trigger Failed. Verify AUTH_KEY settings.');
+    const triggerResult = await res.json();
+    if (triggerResult.status !== 'success') throw new Error('Trigger Failed. Verify Proxy URL settings.');
 
         let sec = 0;
         let pct = 20;
@@ -471,7 +466,7 @@
 
           try {
             const runCheck = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs?per_page=1`, {
-              headers: { 'Authorization': `Bearer ${AUTH_KEY}` }
+              headers: {}
             });
 
             if (runCheck.ok) {
@@ -481,7 +476,7 @@
               if (latestRun && latestRun.status === 'completed') {
                 if (latestRun.conclusion === 'success') {
                   const relCheck = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases`, {
-                    headers: { 'Authorization': `Bearer ${AUTH_KEY}` }
+                    headers: {}
                   });
 
                   if (relCheck.ok) {
