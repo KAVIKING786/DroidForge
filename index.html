@@ -14,10 +14,17 @@
 </head>
 <body class="p-4 md:p-8 min-h-screen flex justify-center">
 
-  <div class="w-full max-w-xl">
-    <div class="text-center mb-4">
-      <p class="text-xs text-slate-400">No Watermark • 100% Free Real APK Builder</p>
+<div class="w-full max-w-xl">
+  <!-- TOP BANNER AD -->
+  <div class="mb-4">
+    <div class="bg-[#161b22] border border-dashed border-slate-700 rounded-xl p-2.5 text-center text-xs text-slate-400">
+      <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">AD</span> Sponsored: High Speed Cloud Engine
     </div>
+  </div>
+
+  <div class="text-center mb-4">
+    <p class="text-xs text-slate-400">No Watermark • 100% Free Real APK Builder</p>
+  </div>
 
     <!-- Navigation Tabs -->
     <div class="flex border-b border-slate-800 text-xs font-semibold mb-6">
@@ -108,52 +115,71 @@
 </html></textarea>
       </div>
 
-      <!-- Monetization Accordion -->
-      <details class="rounded-xl border border-slate-800 bg-[#161b22] p-2.5">
-        <summary class="text-xs font-semibold text-amber-400 cursor-pointer flex justify-between items-center">
-          <span>💰 Monetization / AdMob (Optional)</span>
-          <span class="text-[10px] text-slate-500">▼</span>
-        </summary>
-        <div class="mt-2 space-y-2 pt-2 border-t border-slate-800">
-          <input type="text" id="admobId" placeholder="AdMob App ID (ca-app-pub-...)" class="w-full input-box rounded-lg p-2 text-xs">
-        </div>
-            </details>
+      <!-- MULTI-ADMOB MONETIZATION -->
+<details class="rounded-xl border border-slate-800 bg-[#161b22] p-3">
+  <summary class="text-xs font-semibold text-amber-400 cursor-pointer flex justify-between items-center">
+    <span>💰 Monetization / AdMob (Multi-Ads)</span>
+    <span class="text-slate-500 text-[10px]">▼</span>
+  </summary>
+  <div class="mt-3 space-y-2 pt-2 border-t border-slate-800 text-xs">
+    <div>
+      <label class="text-slate-400 block mb-0.5">AdMob App ID</label>
+      <input type="text" id="admobId" placeholder="ca-app-pub-xxxxxxxx~yyyyyyyy" class="w-full input-box rounded-lg p-2 text-xs font-mono">
+    </div>
+    <div>
+      <label class="text-slate-400 block mb-0.5">1. Banner Ad Unit ID</label>
+      <input type="text" id="admobBanner" placeholder="ca-app-pub-xxxxxxxx/banner_id" class="w-full input-box rounded-lg p-2 text-xs font-mono">
+    </div>
+    <div>
+      <label class="text-slate-400 block mb-0.5">2. Interstitial Ad Unit ID</label>
+      <input type="text" id="admobInter" placeholder="ca-app-pub-xxxxxxxx/inter_id" class="w-full input-box rounded-lg p-2 text-xs font-mono">
+    </div>
+    <div>
+      <label class="text-slate-400 block mb-0.5">3. Rewarded Video Ad ID</label>
+      <input type="text" id="admobReward" placeholder="ca-app-pub-xxxxxxxx/reward_id" class="w-full input-box rounded-lg p-2 text-xs font-mono">
+    </div>
+  </div>
+</details>
+
       </div>
 
-      <!-- TAB 2: HARDWARE & WEBVIEW -->
-      <div id="tabHw" class="hidden space-y-4">
-        <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider">Hardware & System Permissions</h3>
-        <div class="space-y-2 text-xs">
-          <label class="flex items-center gap-2 bg-[#161b22] p-3 rounded-xl border border-slate-800 cursor-pointer">
-            <input type="checkbox" checked class="accent-sky-500">
-            <span>⚡ Hardware Acceleration (WebGL / 3D Canvas Engine)</span>
-          </label>
-          <label class="flex items-center gap-2 bg-[#161b22] p-3 rounded-xl border border-slate-800 cursor-pointer">
-            <input type="checkbox" checked class="accent-sky-500">
-            <span>🎵 Media Audio & Inline Background Playback</span>
-          </label>
-          <label class="flex items-center gap-2 bg-[#161b22] p-3 rounded-xl border border-slate-800 cursor-pointer">
-            <input type="checkbox" checked class="accent-sky-500">
-            <span>📷 Camera & Microphone Recording API</span>
-          </label>
-          <label class="flex items-center gap-2 bg-[#161b22] p-3 rounded-xl border border-slate-800 cursor-pointer">
-            <input type="checkbox" checked class="accent-sky-500">
-            <span>💾 Offline Local Storage & Cache Persistence</span>
-          </label>
-        </div>
+        <!-- TAB 2: APP SETTINGS & ENGINE -->
+  <div id="tabHw" class="hidden space-y-4">
+    <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider">Engine Settings</h3>
+    
+    <div class="bg-[#161b22] border border-slate-800 rounded-xl p-3.5 space-y-2.5 text-xs">
+      <div class="flex justify-between items-center text-slate-300">
+        <span>Hardware Engine (WebGL/Audio/Storage)</span>
+        <span class="text-emerald-400 font-bold text-[11px]">Auto Enabled ✓</span>
       </div>
+      <div class="flex justify-between items-center text-slate-300">
+        <span>Android Export Architecture</span>
+        <span class="text-slate-400 text-[11px]">ARM64 / v7a</span>
+      </div>
+    </div>
 
-      <!-- TAB 3: TEMPLATES -->
-      <div id="tabTpl" class="hidden space-y-4">
-        <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider">Instant Application Templates</h3>
-        <p class="text-[11px] text-slate-400">Clicking any template will load its code into Project Info:</p>
-        <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-          <button type="button" onclick="loadPreset('music')" class="bg-[#161b22] hover:bg-sky-600 border border-slate-800 p-3 rounded-xl text-left">🎵 Audio Player</button>
-          <button type="button" onclick="loadPreset('game')" class="bg-[#161b22] hover:bg-sky-600 border border-slate-800 p-3 rounded-xl text-left">🎮 Canvas Game</button>
-          <button type="button" onclick="loadPreset('ai')" class="bg-[#161b22] hover:bg-sky-600 border border-slate-800 p-3 rounded-xl text-left">🤖 AI Assistant</button>
-          <button type="button" onclick="loadPreset('calc')" class="bg-[#161b22] hover:bg-sky-600 border border-slate-800 p-3 rounded-xl text-left">🧮 Calculator Tool</button>
-        </div>
-      </div>
+    <!-- TAB 2 AD BANNER -->
+    <div class="bg-[#161b22] border border-dashed border-slate-700 rounded-xl p-3 text-center text-xs text-slate-400">
+      <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">AD</span> Turbo Gradle Cloud Cache: Enabled
+    </div>
+  </div>
+
+
+        <!-- TAB 3: TEMPLATES & GUIDE -->
+  <div id="tabTpl" class="hidden space-y-4">
+    <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider">Ready Templates & Guides</h3>
+    
+    <div class="bg-[#161b22] border border-slate-800 rounded-xl p-3.5 space-y-2 text-xs text-slate-300">
+      <p class="font-medium text-white">💡 Custom Webview Tip:</p>
+      <p class="text-[11px] text-slate-400">Paste your responsive HTML, CSS, and JavaScript directly into Project Info. Native features and AdMob SDK are auto-injected during cloud packaging.</p>
+    </div>
+
+    <!-- TAB 3 AD BANNER -->
+    <div class="bg-[#161b22] border border-dashed border-slate-700 rounded-xl p-3 text-center text-xs text-slate-400">
+      <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">AD</span> Free SSL & Unlimited Cloud APK Hosting
+    </div>
+  </div>
+
 
       <!-- Main Action Button -->
       <button id="buildBtn" onclick="runBuildPipeline()" class="w-full bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2">
@@ -162,6 +188,12 @@
 
       <!-- Progress Section -->
       <div id="progBox" class="hidden bg-[#161b22] border border-slate-800 rounded-xl p-4 space-y-2">
+              <!-- BUILD TIME PROMOTIONAL AD -->
+      <div class="bg-amber-950/40 border border-amber-800/40 rounded-lg p-2.5 text-center text-xs text-amber-200">
+        <span class="text-[9px] bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded mr-1">PROMOTION</span>
+        ⚡ Turbo Build Activated: APK generating without watermark!
+      </div>
+
         <div class="flex justify-between items-center text-xs">
           <span id="stLabel" class="text-sky-400 font-medium">⚡ Packaging Application...</span>
           <span id="pctLabel" class="font-mono text-slate-300">0%</span>
@@ -175,6 +207,12 @@
           </a>
         </div>
       </div>
+          <!-- BOTTOM BANNER AD -->
+    <div class="pt-4">
+      <div class="bg-[#161b22] border border-dashed border-slate-700 rounded-xl p-2.5 text-center text-xs text-slate-400">
+        <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">AD</span> Google Play Console Ready Apps - Fast Deployment
+      </div>
+    </div>
 
     </div>
   </div>
