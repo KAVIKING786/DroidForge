@@ -30,21 +30,40 @@ jobs:
           cordova create myApp ${{ github.event.inputs.package_id }} "${{ github.event.inputs.app_name }}"
           cd myApp
           cordova platform add android
+                    # Decode HTML content safely first
+          mkdir -p www
+          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html
+
+          # Basic core plugin
           cordova plugin add cordova-plugin-whitelist
-          cordova plugin add cordova-plugin-android-permissions
-          cordova plugin add cordova-plugin-media
-          cordova plugin add cordova-plugin-camera
+
+          # Smart Auto-Detect Plugins based on code
+          if grep -qi "camera\|capturePhoto" www/index.html; then
+            echo "Camera detected, adding camera plugin..."
+            cordova plugin add cordova-plugin-camera
+          fi
+
+          if grep -qi "audio\|record\|media" www/index.html; then
+            echo "Media/Audio detected, adding media plugin..."
+            cordova plugin add cordova-plugin-media
+          fi
+
+          if grep -qi "vibrate\|vibration" www/index.html; then
+            echo "Vibration detected, adding vibration plugin..."
+            cordova plugin add cordova-plugin-vibration
+          fi
+
+          if grep -qi "permission" www/index.html; then
+            cordova plugin add cordova-plugin-android-permissions
+          fi
 
           # Inject Hardware Acceleration & Permissions in Config
           sed -i '/<\/widget>/i <preference name="android-hardwareAccelerated" value="true" />' config.xml
           sed -i '/<\/widget>/i <preference name="AllowInlineMediaPlayback" value="true" />' config.xml
 
-          # Decode HTML content safely
-          mkdir -p www
-          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html 
-          find platforms/android -name "*.gradle" -type f -exec sed -i 's|jcenter()|google()\n mavenCentral()|g' {} +
-          
-
+          find platforms/android -name "*.gradle" -type f -exec sed -i 's|jcenter()|google()\n  mavenCentral()|g' {} +
+        
+        
       - name: Build Standalone APK
         run: |
           cd myApp
