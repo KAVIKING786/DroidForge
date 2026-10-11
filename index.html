@@ -440,7 +440,8 @@
 
       try {
      const res = await fetch(PROXY_URL, {
-      method: 'POST',
+      method: 'POST', 
+      mode: 'no-cors',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8'
       },
@@ -453,10 +454,7 @@
         }
       })
     });
-
-    const triggerResult = await res.json();
-    if (triggerResult.status !== 'success') throw new Error('Trigger Failed. Verify Proxy URL settings.');
-
+  
         let sec = 0;
         let pct = 20;
 
