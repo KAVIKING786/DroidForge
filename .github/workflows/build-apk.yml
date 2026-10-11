@@ -78,8 +78,8 @@ jobs:
       - name: Publish Direct Public Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest-build
-          name: "Direct APK Build"
+          tag_name: v${{ github.run_number }}-${{ github.run_id }}
+          name: "Release ${{ github.event.inputs.app_name }}"
           files: myApp/platforms/android/app/build/outputs/apk/debug/*.apk
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
