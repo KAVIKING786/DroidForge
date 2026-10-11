@@ -41,11 +41,15 @@ jobs:
 
           # Decode HTML content safely
           mkdir -p www
-          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html
+          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html 
+          find platforms/android -name "*.gradle" -type f -exec sed -i 's|jcenter()|google()\n mavenCentral()|g' {} +
+          
 
       - name: Build Standalone APK
         run: |
           cd myApp
+          export GRADLE_OPTS="-Dhttps.protocols=TLSv1.2 -Dorg.gradle.daemon=false"
+
           cordova build android --debug
 
       - name: Publish Direct Public Release
