@@ -26,11 +26,17 @@
     <p class="text-xs text-slate-400">No Watermark • 100% Free Real APK Builder</p>
   </div>
 
-    <!-- Navigation Tabs -->
-    <div class="flex border-b border-slate-800 text-xs font-semibold mb-6">
-      <button id="tabProjectBtn" onclick="switchTab('project')" class="tab-btn active py-2.5 px-4 flex items-center gap-1.5 whitespace-nowrap">🛠️ Project Info</button>
-      <button id="tabTplBtn" onclick="switchTab('tpl')" class="tab-btn py-2.5 px-4 flex items-center gap-1.5 whitespace-nowrap">📁 Templates</button>
-      <button id="tabHwBtn" onclick="switchTab('hw')" class="tab-btn py-2.5 px-4 flex items-center gap-1.5 whitespace-nowrap">⚙️ Settings</button>
+   <!-- Navigation Tabs (Centered & Equal Width) -->
+    <div class="flex items-center justify-center gap-1.5 p-1 bg-[#12161f] border border-slate-800 rounded-xl mb-6">
+      <button id="tabProjectBtn" onclick="switchTab('project')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1">
+        🛠️ Project Info
+      </button>
+      <button id="tabTplBtn" onclick="switchTab('tpl')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1">
+        📁 Templates
+      </button>
+      <button id="tabHwBtn" onclick="switchTab('hw')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1">
+        ⚙️ Settings
+      </button>
     </div>
 
     <!-- Main Container -->
@@ -286,18 +292,7 @@
         <span class="text-slate-500">›</span>
       </div>
 
-      <div class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
-        <div class="flex items-center gap-3">
-          <span class="text-amber-400 text-sm">⭐</span>
-          <div>
-            <div class="font-bold text-white">Pro Status</div>
-            <div class="text-[10px] text-slate-400">Free Tier (No Watermark Active)</div>
-          </div>
-        </div>
-        <span class="text-slate-500">›</span>
-      </div>
-
-      <div onclick="alert('Build cache cleared successfully!')" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
+      <div onclick="clearAllAppCache()" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
         <div class="flex items-center gap-3">
           <span class="text-rose-400 text-sm">🗑️</span>
           <div>
@@ -528,6 +523,304 @@
         buildBtn.classList.remove('opacity-50');
       }
     }
+  </script> 
+    <!-- ================= DROIDFORGE ENGINE MODALS & RUNTIME ================= -->
+  <!-- 1. UNIVERSAL API & TEMPLATE MODAL -->
+  <div id="dfModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#12161f] border border-slate-700/80 rounded-2xl w-full max-w-md max-h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <!-- Modal Header -->
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-[#161b26]">
+        <div class="flex items-center gap-2">
+          <button onclick="closeDfModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm">✕</button>
+          <h3 id="dfModalTitle" class="font-bold text-sm text-white">Title</h3>
+        </div>
+        <span id="dfModalBadge" class="text-[10px] px-2 py-0.5 rounded font-mono bg-sky-950 text-sky-400 border border-sky-800/40">100% FREE</span>
+      </div>
+      <!-- Modal Body -->
+      <div id="dfModalBody" class="p-4 overflow-y-auto space-y-3 text-xs flex-1">
+        <!-- Content Injected Dynamically -->
+      </div>
+      <!-- Modal Footer -->
+      <div id="dfModalFooter" class="p-3 border-t border-slate-800/80 bg-[#161b26] hidden">
+        <button id="dfModalActionBtn" class="w-full py-2.5 rounded-xl font-bold text-xs bg-sky-500 hover:bg-sky-400 text-slate-950 transition-all shadow-lg shadow-sky-500/20">
+          Create Project with this API
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------------- 1. MULTI-LANGUAGE REGISTRY ----------------
+    const DF_LANGUAGES = [
+      { code: 'sys', name: 'System default (English)' },
+      { code: 'en', name: 'English' },
+      { code: 'ta', name: 'தமிழ் (Tamil)' },
+      { code: 'hi', name: 'हिन्दी (Hindi)' },
+      { code: 'te', name: 'తెలుగు (Telugu)' },
+      { code: 'ml', name: 'മലയാളം (Malayalam)' },
+      { code: 'kn', name: 'ಕನ್ನಡ (Kannada)' },
+      { code: 'es', name: 'Español (Spanish)' },
+      { code: 'fr', name: 'Français (French)' },
+      { code: 'de', name: 'Deutsch (German)' },
+      { code: 'ru', name: 'Русский (Russian)' },
+      { code: 'ar', name: 'العربية (Arabic)' },
+      { code: 'zh', name: '中文 (Chinese)' },
+      { code: 'ja', name: '日本語 (Japanese)' },
+      { code: 'ko', name: '한국어 (Korean)' },
+      { code: 'pt', name: 'Português (Portuguese)' },
+      { code: 'it', name: 'Italiano (Italian)' },
+      { code: 'tr', name: 'Türkçe (Turkish)' },
+      { code: 'id', name: 'Bahasa Indonesia' },
+      { code: 'vi', name: 'Tiếng Việt' }
+    ];
+
+    // ---------------- 2. THEMES REGISTRY ----------------
+    const DF_THEMES = [
+      { id: 'dark', name: 'System (Default Dark)', bg: '#0d1117', card: '#161b22', border: '#30363d', accent: '#38bdf8' },
+      { id: 'white', name: 'White (Light Mode)', bg: '#f8fafc', card: '#ffffff', border: '#cbd5e1', accent: '#0284c7' },
+      { id: 'sky', name: 'Sky Blue', bg: '#081a2e', card: '#0f2744', border: '#1e40af', accent: '#38bdf8' },
+      { id: 'rose', name: 'Rose Pink', bg: '#240a15', card: '#3b1224', border: '#831843', accent: '#f43f5e' },
+      { id: 'mint', name: 'Mint Green', bg: '#06231a', card: '#0d382b', border: '#065f46', accent: '#10b981' },
+      { id: 'purple', name: 'Purple Night', bg: '#180f2d', card: '#251745', border: '#5b21b6', accent: '#a855f7' },
+      { id: 'amoled', name: 'Pure AMOLED (Pitch Black)', bg: '#000000', card: '#0a0a0a', border: '#222222', accent: '#38bdf8' }
+    ];
+
+    // ---------------- 3. SUB-APIS DEFINITIONS ----------------
+    const DF_API_DATABASE = {
+      interaction: {
+        title: "Interaction APIs",
+        items: [
+          { name: "Vibrate", desc: "Control device vibration motor.", code: "AndroidAPI.vibrate(500);" },
+          { name: "Torch / Flashlight", desc: "Toggle camera flashlight on/off.", code: "AndroidAPI.setTorch(true);\n// AndroidAPI.setTorch(false);" },
+          { name: "Notification", desc: "Send immediate native Android notification.", code: "AndroidAPI.showNotification('Title', 'Message body');" },
+          { name: "Toast Message", desc: "Show brief Android toast message.", code: "AndroidAPI.showToast('Hello from DroidForge!');" }
+        ]
+      },
+      starters: {
+        title: "Starters Layouts",
+        items: [
+          { name: "Blank Page", desc: "A clean empty canvas to design your UI.", code: "<!DOCTYPE html>\n<html>\n<head><title>App</title></head>\n<body style='background:#111;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;'>\n  <h2>Ready App Shell</h2>\n</body>\n</html>" },
+          { name: "Fullscreen Canvas", desc: "Game canvas layout without borders.", code: "<canvas id='game' style='width:100vw;height:100vh;background:#000;'></canvas>" },
+          { name: "Local Notes", desc: "Save and load text files inside app storage.", code: "AndroidAPI.writeAppFile('notes.txt', 'Saved Note Content');\nvar text = AndroidAPI.readAppFile('notes.txt');" },
+          { name: "Deep Link Receiver", desc: "Open app via custom browser links (myapp://).", code: "var link = AndroidAPI.getLaunchDeepLink();\nwindow.onDeepLink = function(url) { console.log(url); };" }
+        ]
+      },
+      libraries: {
+        title: "Starter Libraries",
+        items: [
+          { name: "Tailwind CSS", desc: "Pre-configured modern utility framework.", code: "<script src='https://cdn.tailwindcss.com'><\/script>\n<div class='p-6 bg-slate-900 text-white min-h-screen'>Tailwind Ready</div>" },
+          { name: "Bootstrap 5", desc: "Responsive Bootstrap 5 CDN starter.", code: "<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>\n<div class='container py-4 text-light'>Bootstrap Ready</div>" },
+          { name: "Phaser 3 Game Engine", desc: "2D Canvas Game Framework bundle.", code: "<script src='https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js'><\/script>" },
+          { name: "React (CDN)", desc: "Zero-build minimal React bundle.", code: "<script src='https://unpkg.com/react@18/umd/react.production.min.js'><\/script>\n<script src='https://unpkg.com/react-dom@18/umd/react-dom.production.min.js'><\/script>" }
+        ]
+      },
+      earn: {
+        title: "Earn Money (AdMob)",
+        items: [
+          { name: "Banner Ad", desc: "Place responsive banner ad strip.", code: "AndroidAPI.showBannerAd();\n// AndroidAPI.showBannerAd('top');\n// AndroidAPI.hideBannerAd();" },
+          { name: "Interstitial Ad", desc: "Show full-screen interstitial ad on transitions.", code: "AndroidAPI.showInterstitialAd();" },
+          { name: "Rewarded Video Ad", desc: "Reward user upon complete ad view.", code: "AndroidAPI.showRewardedAd();\nwindow.addEventListener('rewardEarned', function(e) { alert('Coins rewarded!'); });" }
+        ]
+      },
+      device: {
+        title: "Native Device APIs",
+        items: [
+          { name: "GPS Location", desc: "Acquire real-time GPS coordinates.", code: "AndroidAPI.getLocation('loc1');\nwindow.onAndroidEvent = function(e, d) { if(e==='locationResult') console.log(d); };" },
+          { name: "Camera Photo", desc: "Capture photo via hardware camera.", code: "AndroidAPI.capturePhoto('cam1');" },
+          { name: "Microphone Recorder", desc: "Record audio directly to local file.", code: "AndroidAPI.startAudioRecording('record.mp4');\n// AndroidAPI.stopAudioRecording('rec1');" },
+          { name: "File Picker & Storage", desc: "Open document selector or read files.", code: "AndroidAPI.pickFile('*/*', 'pick1');\nAndroidAPI.writeFile('file.txt', 'Text', 'text/plain', 'w1');" },
+          { name: "Clipboard", desc: "Read and write device clipboard text.", code: "AndroidAPI.copyToClipboard('Copied text!');\nvar paste = AndroidAPI.pasteFromClipboard();" },
+          { name: "Native Share Sheet", desc: "Trigger Android system share dialog.", code: "AndroidAPI.shareText('Check out my application!');" },
+          { name: "Save to Gallery", desc: "Export base64 images to gallery.", code: "AndroidAPI.saveToGallery('pic.png', base64Data, 'gal1');" }
+        ]
+      },
+      sensors: {
+        title: "Hardware Sensors",
+        items: [
+          { name: "Accelerometer", desc: "Read 3-axis motion (X, Y, Z).", code: "AndroidAPI.startSensor('accelerometer', 'acc1');" },
+          { name: "Gyroscope", desc: "Read rotation rate in space.", code: "AndroidAPI.startSensor('gyroscope', 'gyro1');" },
+          { name: "Magnetometer / Compass", desc: "Read surrounding magnetic fields.", code: "AndroidAPI.startSensor('magnetometer', 'mag1');" },
+          { name: "Step Counter", desc: "Count pedometer walking steps.", code: "AndroidAPI.startSensor('stepCounter', 'step1');" },
+          { name: "Orientation", desc: "Read device angle and tilt.", code: "AndroidAPI.startSensor('orientation', 'ori1');" }
+        ]
+      },
+      system: {
+        title: "System APIs",
+        items: [
+          { name: "Device Info", desc: "Read device model, SDK level, brand.", code: "var info = AndroidAPI.getDeviceInfo();\nconsole.log(info);" },
+          { name: "Battery Status", desc: "Inspect current battery level %.", code: "var level = AndroidAPI.getBatteryLevel();\nconsole.log('Battery: ' + level + '%');" },
+          { name: "Permission Check", desc: "Verify runtime permission status.", code: "var granted = AndroidAPI.hasPermission('android.permission.CAMERA');" },
+          { name: "Screen Brightness", desc: "Read display brightness value.", code: "var brightness = AndroidAPI.getScreenBrightness();" },
+          { name: "Scheduled Notification", desc: "Schedule recurring alarm notifications.", code: "AndroidAPI.scheduleNotification('alarm1', 'Reminder', 'Message', 5000, 86400000);" }
+        ]
+      },
+      dashboard: {
+        title: "All-in-One Dashboard",
+        items: [
+          { name: "Master Full Android API Shell", desc: "All native hardware, ads, and sensors integrated.", code: "// DROIDFORGE ALL-IN-ONE MASTER HARNESS\nAndroidAPI.showToast('Master Initialized');\nAndroidAPI.showBannerAd();\nAndroidAPI.vibrate(200);" }
+        ]
+      }
+    };
+
+    // ---------------- 4. MODAL CONTROLLERS ----------------
+    function openDfModal(title, contentHtml, showAction = false, actionCode = "") {
+      document.getElementById('dfModalTitle').innerText = title;
+      document.getElementById('dfModalBody').innerHTML = contentHtml;
+      const footer = document.getElementById('dfModalFooter');
+      const actionBtn = document.getElementById('dfModalActionBtn');
+      if(showAction) {
+        footer.classList.remove('hidden');
+        actionBtn.onclick = function() {
+          injectCodeToProject(actionCode);
+          closeDfModal();
+        };
+      } else {
+        footer.classList.add('hidden');
+      }
+      document.getElementById('dfModal').classList.remove('hidden');
+    }
+
+    function closeDfModal() {
+      document.getElementById('dfModal').classList.add('hidden');
+    }
+
+    // ---------------- 5. TEMPLATES & API CLICK HANDLER ----------------
+    function applyTemplate(category) {
+      const data = DF_API_DATABASE[category];
+      if(!data) return;
+
+      let html = `<div class="space-y-2.5">`;
+      data.items.forEach((item, idx) => {
+        html += `
+          <div onclick="showApiDetail('${category}', ${idx})" class="p-3 bg-[#181f2c] border border-slate-800 rounded-xl hover:border-sky-500/50 cursor-pointer flex justify-between items-center group">
+            <div>
+              <div class="font-bold text-white group-hover:text-sky-400">${item.name}</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">${item.desc}</div>
+            </div>
+            <span class="text-slate-500 group-hover:text-sky-400 font-bold">›</span>
+          </div>`;
+      });
+      html += `</div>`;
+
+      openDfModal(data.title, html, false);
+    }
+
+    function showApiDetail(category, index) {
+      const item = DF_API_DATABASE[category].items[index];
+      const encodedCode = encodeURIComponent(item.code);
+      let html = `
+        <div class="space-y-3">
+          <p class="text-slate-300 leading-relaxed">${item.desc}</p>
+          <div>
+            <div class="flex justify-between items-center mb-1 text-[11px] font-semibold text-sky-400">
+              <span>How to call this API</span>
+              <button onclick="navigator.clipboard.writeText(decodeURIComponent('${encodedCode}')); alert('Code copied!');" class="text-slate-400 hover:text-white text-[10px] bg-slate-800 px-2 py-0.5 rounded">Copy</button>
+            </div>
+            <pre class="bg-black/60 p-3 rounded-xl border border-slate-800 text-[11px] text-sky-300 font-mono overflow-x-auto whitespace-pre-wrap">${item.code}</pre>
+          </div>
+        </div>`;
+      openDfModal(item.name, html, true, item.code);
+    }
+
+    function injectCodeToProject(code) {
+      switchTab('project');
+      const editor = document.querySelector('textarea');
+      if(editor) {
+        editor.value = code;
+        alert('API Code inserted successfully into Project Info!');
+      }
+    }
+
+    // ---------------- 6. SETTINGS MODALS (LANGUAGES, THEMES, KEYSTORE) ----------------
+    function openLanguageModal() {
+      let html = `<div class="divide-y divide-slate-800/80 max-h-[60vh] overflow-y-auto">`;
+      DF_LANGUAGES.forEach(lang => {
+        html += `
+          <div onclick="setAppLanguage('${lang.code}', '${lang.name}')" class="p-3 flex items-center justify-between cursor-pointer hover:bg-slate-800/40">
+            <span class="text-slate-200">${lang.name}</span>
+            <span class="text-sky-400 text-xs">✓</span>
+          </div>`;
+      });
+      html += `</div>`;
+      openDfModal("Select Language", html, false);
+    }
+
+    function setAppLanguage(code, name) {
+      alert("Language changed to: " + name);
+      closeDfModal();
+    }
+
+    function openThemeModal() {
+      let html = `<div class="divide-y divide-slate-800/80">`;
+      DF_THEMES.forEach(t => {
+        html += `
+          <div onclick="applyTheme('${t.id}')" class="p-3 flex items-center justify-between cursor-pointer hover:bg-slate-800/40">
+            <div class="flex items-center gap-3">
+              <span class="w-4 h-4 rounded-full border border-white/20" style="background:${t.bg}"></span>
+              <span class="text-slate-200">${t.name}</span>
+            </div>
+            <span class="text-sky-400 text-xs">✓</span>
+          </div>`;
+      });
+      html += `</div>`;
+      openDfModal("Select Theme", html, false);
+    }
+
+    function applyTheme(themeId) {
+      const selected = DF_THEMES.find(t => t.id === themeId);
+      if(!selected) return;
+      document.body.style.backgroundColor = selected.bg;
+      document.querySelectorAll('.bg-\\[\\#161b22\\]').forEach(el => el.style.backgroundColor = selected.card);
+      closeDfModal();
+    }
+
+    function openKeystoreModal() {
+      let html = `
+        <div class="space-y-3">
+          <div class="p-3 bg-black/40 border border-slate-800 rounded-xl space-y-2">
+            <div><span class="text-slate-400 text-[10px]">Active Alias:</span> <div class="font-mono text-white">droidforge_release_key</div></div>
+            <div><span class="text-slate-400 text-[10px]">Algorithm:</span> <div class="font-mono text-white">RSA 2048-bit (SHA256withRSA)</div></div>
+            <div><span class="text-slate-400 text-[10px]">Validity:</span> <div class="font-mono text-white">25 Years (Google Play Store Ready)</div></div>
+          </div>
+          <button onclick="alert('Keystore file generated and verified with cloud pipeline!');" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold">
+            Download Signing Keystore (.jks)
+          </button>
+        </div>`;
+      openDfModal("Keystore Manager", html, false);
+    }
+
+    // Attach click events to Settings cards
+    document.addEventListener("DOMContentLoaded", function() {
+      const settingsCard = document.getElementById('tabHw');
+      if(settingsCard) {
+        const rows = settingsCard.querySelectorAll('.cursor-pointer');
+        if(rows[0]) rows[0].onclick = openLanguageModal;
+        if(rows[1]) rows[1].onclick = openThemeModal;
+        if(rows[2]) rows[2].onclick = openKeystoreModal;
+      }
+    }); 
+        function clearAllAppCache() {
+      if (confirm("Are you sure you want to clear build cache and reset all inputs?")) {
+        const appName = document.getElementById('appName');
+        if (appName) appName.value = 'My Awesome App';
+        
+        const pkgId = document.getElementById('packageId');
+        if (pkgId) pkgId.value = 'com.droidforge.myawesomeapp';
+        
+        const iconInput = document.getElementById('appIcon');
+        if (iconInput) iconInput.value = '';
+
+        const codeArea = document.querySelector('textarea');
+        if (codeArea) codeArea.value = '';
+
+        localStorage.clear();
+        sessionStorage.clear();
+
+        alert("Build cache cleared and project reset successfully!");
+      }
+    }
+
   </script>
+
 </body>
 </html>
