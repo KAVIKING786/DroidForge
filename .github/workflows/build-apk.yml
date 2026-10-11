@@ -69,7 +69,11 @@ jobs:
           cd myApp
           export GRADLE_OPTS="-Dhttps.protocols=TLSv1.2 -Dorg.gradle.daemon=false"
 
-          cordova build android --debug
+          cordova build android --debug 
+          SAFE_APP_NAME=$(echo "${{ github.event.inputs.app_name }}" | tr -dc '[:alnum:]_')
+          if [ -z "$SAFE_APP_NAME" ]; then SAFE_APP_NAME="CustomApp"; fi
+          mv platforms/android/app/build/outputs/apk/debug/app-debug.apk platforms/android/app/build/outputs/apk/debug/${SAFE_APP_NAME}.apk
+
 
       - name: Publish Direct Public Release
         uses: softprops/action-gh-release@v2
