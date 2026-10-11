@@ -28,9 +28,9 @@
 
     <!-- Navigation Tabs -->
     <div class="flex border-b border-slate-800 text-xs font-semibold mb-6">
-      <button id="tabProjectBtn" onclick="switchTab('project')" class="tab-btn active py-2.5 px-4 flex items-center gap-1.5">🛠️ Project Info</button>
-      <button id="tabHwBtn" onclick="switchTab('hw')" class="tab-btn py-2.5 px-4 flex items-center gap-1.5">⚡ Hardware & Webview</button>
-      <button id="tabTplBtn" onclick="switchTab('tpl')" class="tab-btn py-2.5 px-4 flex items-center gap-1.5">📁 Templates</button>
+      <button id="tabProjectBtn" onclick="switchTab('project')" class="tab-btn active py-2.5 px-4 flex items-center gap-1.5 whitespace-nowrap">🛠️ Project Info</button>
+      <button id="tabTplBtn" onclick="switchTab('tpl')" class="tab-btn py-2.5 px-4 flex items-center gap-1.5 whitespace-nowrap">📁 Templates</button>
+      <button id="tabHwBtn" onclick="switchTab('hw')" class="tab-btn py-2.5 px-4 flex items-center gap-1.5 whitespace-nowrap">⚙️ Settings</button>
     </div>
 
     <!-- Main Container -->
@@ -143,43 +143,178 @@
 
       </div>
 
-        <!-- TAB 2: APP SETTINGS & ENGINE -->
-  <div id="tabHw" class="hidden space-y-4">
-    <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider">Engine Settings</h3>
-    
-    <div class="bg-[#161b22] border border-slate-800 rounded-xl p-3.5 space-y-2.5 text-xs">
-      <div class="flex justify-between items-center text-slate-300">
-        <span>Hardware Engine (WebGL/Audio/Storage)</span>
-        <span class="text-emerald-400 font-bold text-[11px]">Auto Enabled ✓</span>
+    <!-- TAB 2: TEMPLATES -->
+  <div id="tabTpl" class="hidden space-y-3">
+    <p class="text-xs text-slate-400 mb-2">Ready-made HTML projects that use native Android APIs.</p>
+
+    <!-- Interaction Card -->
+    <div onclick="applyTemplate('interaction')" class="bg-gradient-to-r from-emerald-950/40 to-[#161b22] border border-emerald-800/40 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-emerald-500">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">📺</div>
+        <div>
+          <h4 class="text-xs font-bold text-white">Interaction</h4>
+          <p class="text-[10px] text-slate-400">Toast, vibration, flashlight and notification...</p>
+        </div>
       </div>
-      <div class="flex justify-between items-center text-slate-300">
-        <span>Android Export Architecture</span>
-        <span class="text-slate-400 text-[11px]">ARM64 / v7a</span>
+      <span class="text-slate-500">›</span>
+    </div>
+
+    <!-- Starters Card -->
+    <div onclick="applyTemplate('starters')" class="bg-[#161b22] border border-slate-800 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-slate-700">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center">✏️</div>
+        <div>
+          <h4 class="text-xs font-bold text-white">Starters</h4>
+          <p class="text-[10px] text-slate-400">Blank pages, full-screen layouts and sim...</p>
+        </div>
       </div>
+      <span class="text-slate-500">›</span>
+    </div>
+
+    <!-- Starter Libraries Card -->
+    <div onclick="applyTemplate('libraries')" class="bg-gradient-to-r from-rose-950/30 to-[#161b22] border border-rose-800/40 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-rose-500">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center">💻</div>
+        <div>
+          <h4 class="text-xs font-bold text-white">Starter Libraries</h4>
+          <p class="text-[10px] text-slate-400">Ready-to-use HTML templates with pop...</p>
+        </div>
+      </div>
+      <span class="text-slate-500">›</span>
+    </div>
+
+    <!-- Earn Money Card -->
+    <div onclick="applyTemplate('earn')" class="bg-gradient-to-r from-emerald-950/40 to-[#161b22] border border-emerald-800/50 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-emerald-400">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">💲</div>
+        <div>
+          <h4 class="text-xs font-bold text-white">Earn Money</h4>
+          <p class="text-[10px] text-slate-400">Earn money with AdMob ads (Banner, Int...</p>
+        </div>
+      </div>
+      <span class="text-slate-500">›</span>
+    </div>
+
+    <!-- Device Card -->
+    <div onclick="applyTemplate('device')" class="bg-[#161b22] border border-slate-800 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-slate-700">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">📍</div>
+        <div>
+          <h4 class="text-xs font-bold text-white">Device</h4>
+          <p class="text-[10px] text-slate-400">Camera, microphone, location, files, clip...</p>
+        </div>
+      </div>
+      <span class="text-amber-400">★</span>
+    </div>
+
+    <!-- Sensors Card -->
+    <div onclick="applyTemplate('sensors')" class="bg-[#161b22] border border-slate-800 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-slate-700">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">🧭</div>
+        <div>
+          <h4 class="text-xs font-bold text-white">Sensors</h4>
+          <p class="text-[10px] text-slate-400">Accelerometer, gyroscope, magnetomet...</p>
+        </div>
+      </div>
+      <span class="text-amber-400">★</span>
+    </div>
+
+    <!-- System Card -->
+    <div onclick="applyTemplate('system')" class="bg-[#161b22] border border-slate-800 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-slate-700">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center">⚙️</div>
+        <div>
+          <h4 class="text-xs font-bold text-white">System</h4>
+          <p class="text-[10px] text-slate-400">Battery, device info, permissions and bri...</p>
+        </div>
+      </div>
+      <span class="text-amber-400">★</span>
+    </div>
+
+    <!-- Dashboard Card -->
+    <div onclick="applyTemplate('dashboard')" class="bg-[#161b22] border border-slate-800 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-slate-700">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-yellow-500/20 text-yellow-400 flex items-center justify-center">🪟</div>
+        <div>
+          <h4 class="text-xs font-bold text-white">Dashboard</h4>
+          <p class="text-[10px] text-slate-400">Ready-to-use dashboards that combine ...</p>
+        </div>
+      </div>
+      <span class="text-amber-400">★</span>
     </div>
 
     <!-- TAB 2 AD BANNER -->
-    <div class="bg-[#161b22] border border-dashed border-slate-700 rounded-xl p-3 text-center text-xs text-slate-400">
-      <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">AD</span> Turbo Gradle Cloud Cache: Enabled
-    </div>
-  </div>
-
-
-        <!-- TAB 3: TEMPLATES & GUIDE -->
-  <div id="tabTpl" class="hidden space-y-4">
-    <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider">Ready Templates & Guides</h3>
-    
-    <div class="bg-[#161b22] border border-slate-800 rounded-xl p-3.5 space-y-2 text-xs text-slate-300">
-      <p class="font-medium text-white">💡 Custom Webview Tip:</p>
-      <p class="text-[11px] text-slate-400">Paste your responsive HTML, CSS, and JavaScript directly into Project Info. Native features and AdMob SDK are auto-injected during cloud packaging.</p>
-    </div>
-
-    <!-- TAB 3 AD BANNER -->
     <div class="bg-[#161b22] border border-dashed border-slate-700 rounded-xl p-3 text-center text-xs text-slate-400">
       <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">AD</span> Free SSL & Unlimited Cloud APK Hosting
     </div>
   </div>
 
+  <!-- TAB 3: SETTINGS -->
+  <div id="tabHw" class="hidden space-y-3">
+    <div class="bg-[#161b22] border border-slate-800 rounded-2xl divide-y divide-slate-800/80 overflow-hidden text-xs">
+      
+      <div class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
+        <div class="flex items-center gap-3">
+          <span class="text-sky-400 text-sm">🌐</span>
+          <div>
+            <div class="font-bold text-white">Language</div>
+            <div class="text-[10px] text-slate-400">System default (English)</div>
+          </div>
+        </div>
+        <span class="text-slate-500">›</span>
+      </div>
+
+      <div class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
+        <div class="flex items-center gap-3">
+          <span class="text-indigo-400 text-sm">🎨</span>
+          <div>
+            <div class="font-bold text-white">Theme</div>
+            <div class="text-[10px] text-slate-400">System (Dark Mode)</div>
+          </div>
+        </div>
+        <span class="text-slate-500">›</span>
+      </div>
+
+      <div class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
+        <div class="flex items-center gap-3">
+          <span class="text-cyan-400 text-sm">🔒</span>
+          <div>
+            <div class="font-bold text-white">Keystore Manager</div>
+            <div class="text-[10px] text-slate-400">Release Keystore (Auto Signed)</div>
+          </div>
+        </div>
+        <span class="text-slate-500">›</span>
+      </div>
+
+      <div class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
+        <div class="flex items-center gap-3">
+          <span class="text-amber-400 text-sm">⭐</span>
+          <div>
+            <div class="font-bold text-white">Pro Status</div>
+            <div class="text-[10px] text-slate-400">Free Tier (No Watermark Active)</div>
+          </div>
+        </div>
+        <span class="text-slate-500">›</span>
+      </div>
+
+      <div onclick="alert('Build cache cleared successfully!')" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
+        <div class="flex items-center gap-3">
+          <span class="text-rose-400 text-sm">🗑️</span>
+          <div>
+            <div class="font-bold text-white">Clear Cache</div>
+            <div class="text-[10px] text-slate-400">Clean temporary build files (0.0 MB)</div>
+          </div>
+        </div>
+        <span class="text-slate-500">›</span>
+      </div>
+
+    </div>
+
+    <!-- TAB 3 AD BANNER -->
+    <div class="bg-[#161b22] border border-dashed border-slate-700 rounded-xl p-3 text-center text-xs text-slate-400">
+      <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">AD</span> Turbo Gradle Cloud Cache: Enabled
+    </div>
+  </div>
 
       <!-- Main Action Button -->
       <button id="buildBtn" onclick="runBuildPipeline()" class="w-full bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2">
