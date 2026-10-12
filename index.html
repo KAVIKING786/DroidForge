@@ -467,46 +467,38 @@
         stLabel.innerText = "Compiling Android APK... Please wait 2-3 mins";
 
         try {
-          const runCheck = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs?per_page=1`);
-          if (runCheck.ok) {
-            const runData = await runCheck.json();
-            const latestRun = runData.workflow_runs?.[0];
-
-            const runStartTime = new Date(latestRun?.created_at).getTime();
+          const relCheck = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases`);
+          if (relCheck.ok) {
+            const relList = await relCheck.json();
             
-            if (latestRun && latestRun.status === 'completed' && latestRun.conclusion === 'success') {
-              
-              const relCheck = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest`);
-              if (relCheck.ok) {
-                const rel = await relCheck.json();
-                const apk = rel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
+            if (relList && relList.length > 0) {
+              const latestRelease = relList[0];
+              const apk = latestRelease.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
 
-                if (apk) {
-                  clearInterval(timer);
-                  pBar.style.width = '100%';
-                  pBar.style.background = '#10b981';
-                  pctLabel.innerText = '100%';
-                  stLabel.innerText = 'Build Successful!';
-                  dlBtn.href = apk.browser_download_url;
-                  dlBtn.innerText = `Install / Download ${appName}.apk`;
-                  dlWrap.classList.remove('hidden');
-                  buildBtn.disabled = false;
-                  buildBtn.classList.remove('opacity-50');
-                  return;
-                }
+              if (apk) {
+                clearInterval(timer);
+                pBar.style.width = '100%';
+                pBar.style.background = '#10b981';
+                pctLabel.innerText = '100%';
+                stLabel.innerText = 'Build Successful!';
+                dlBtn.href = apk.browser_download_url;
+                dlBtn.innerText = `Install / Download ${apk.name}`;
+                dlWrap.classList.remove('hidden');
+                buildBtn.disabled = false;
+                buildBtn.classList.remove('opacity-50');
+                return;
               }
-            } else if (latestRun && latestRun.status === 'completed' && latestRun.conclusion !== 'success') {
-              clearInterval(timer);
-              pBar.style.width = '100%';
-              pBar.style.background = '#ef4444';
-              stLabel.innerText = 'Build Failed!';
-              buildBtn.disabled = false;
-              buildBtn.classList.remove('opacity-50');
-              return;
             }
           }
         } catch (e) {
           console.error(e);
+        }
+
+        if (sec > 420) {
+          clearInterval(timer);
+          stLabel.innerText = 'Build Timeout! Check GitHub Actions.';
+          buildBtn.disabled = false;
+          buildBtn.classList.remove('opacity-50');
         }
       }, 5000);
 
