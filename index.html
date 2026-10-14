@@ -53,7 +53,7 @@
         </label>
         <div class="flex-1">
           <label class="block text-xs font-medium text-slate-300 mb-1">App Name *</label>
-          <input type="text" id="appName" value="My Awesome App" class="w-full input-box rounded-xl p-2.5 text-sm font-medium">
+          <input type="text" id="appName" value="DroidForge App" class="w-full input-box rounded-xl p-2.5 text-sm font-medium">
         </div>
       </div>
 
@@ -70,7 +70,7 @@
       <!-- Package Name -->
       <div>
         <label class="block text-xs font-medium text-slate-300 mb-1">Package Name *</label>
-        <input type="text" id="packageId" value="com.droidforge.myawesomeapp" class="w-full input-box rounded-xl p-2.5 text-xs font-mono">
+        <input type="text" id="packageId" value="com.droidforge.app" class="w-full input-box rounded-xl p-2.5 text-xs font-mono">
         <p class="text-[10px] text-slate-500 mt-0.5">Android Application ID (e.g. com.company.app)</p>
       </div>
 
@@ -488,7 +488,7 @@
 
         try {
           if (!targetRunId) {
-            const runCheck = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs?per_page=1&_t=${Date.now()}`);
+            const runCheck = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/build-apk.yml/runs?per_page=1&_t=${Date.now()}`);
             if (runCheck.ok) {
               const runData = await runCheck.json();
               const latestRun = runData.workflow_runs?.[0];
@@ -571,10 +571,14 @@
   ];
 
   // ---------------- 2. THEMES REGISTRY ----------------
-  const DF_THEMES = [
-    { id: 'dark', name: 'System (Default Dark)', bg: '#0d1117', card: '#161b22' },
-    { id: 'amoled', name: 'Pure AMOLED (Pitch Black)', bg: '#000000', card: '#0a0a0a' },
-    { id: 'sky', name: 'Deep Sky', bg: '#081a2e', card: '#0f2744' }
+   const DF_THEMES = [
+    { id: 'dark', name: 'Default Dark (GitHub Slate)', bg: '#0d1117', card: '#161b22', border: '#30363d', text: '#c9d1d9', accent: '#0284c7' },
+    { id: 'amoled', name: 'Pure AMOLED (Pitch Black)', bg: '#000000', card: '#0a0a0a', border: '#222222', text: '#f3f4f6', accent: '#38bdf8' },
+    { id: 'sky', name: 'Deep Ocean (Midnight Navy)', bg: '#051329', card: '#0a2244', border: '#1e3a8a', text: '#e0f2fe', accent: '#0284c7' },
+    { id: 'emerald', name: 'Emerald Forest (Hacker Green)', bg: '#031a14', card: '#062d22', border: '#065f46', text: '#d1fae5', accent: '#10b981' },
+    { id: 'purple', name: 'Cyberpunk Violet (Neon Night)', bg: '#130924', card: '#1f1038', border: '#5b21b6', text: '#f3e8ff', accent: '#8b5cf6' },
+    { id: 'amber', name: 'Warm Amber (Sunset Gold)', bg: '#1c1003', card: '#2b1904', border: '#78350f', text: '#fef3c7', accent: '#f59e0b' },
+    { id: 'rose', name: 'Velvet Rose (Crimson Dark)', bg: '#1a050d', card: '#2e0a19', border: '#831843', text: '#ffe4e6', accent: '#f43f5e' }
   ];
 
   // ---------------- 3. SUB-APIS DEFINITIONS ----------------
@@ -738,11 +742,23 @@
     openDfModal("Select Theme", html, false);
   }
 
-  function applyTheme(themeId) {
+    function applyTheme(themeId) {
     const selected = DF_THEMES.find(t => t.id === themeId);
     if (!selected) return;
+
     document.body.style.backgroundColor = selected.bg;
-    document.querySelectorAll('.bg-\\[\\#161b22\\]').forEach(el => el.style.backgroundColor = selected.card);
+    document.body.style.color = selected.text;
+
+    document.querySelectorAll('.bg-\\[\\#161b22\\], .bg-\\[\\#111622\\], .bg-\\[\\#12161f\\]').forEach(el => {
+      el.style.backgroundColor = selected.card;
+      el.style.borderColor = selected.border;
+    });
+
+    document.querySelectorAll('.input-box').forEach(el => {
+      el.style.backgroundColor = selected.bg;
+      el.style.borderColor = selected.border;
+    });
+
     closeDfModal();
   }
 
@@ -760,8 +776,8 @@
 
   function clearAllAppCache() {
     if (confirm("Are you sure you want to clear build cache and reset all inputs?")) {
-      document.getElementById('appName').value = 'My Awesome App';
-      document.getElementById('packageId').value = 'com.droidforge.myawesomeapp';
+      document.getElementById('appName').value = 'DroidForge App';
+      document.getElementById('packageId').value = 'com.droidforge.app';
       document.getElementById('appIcon').value = '';
       document.getElementById('htmlInput').value = '<!DOCTYPE html>\n<html>\n<body>\n<h2>Your Application Ready!</h2>\n</body>\n</html>';
       localStorage.clear();
