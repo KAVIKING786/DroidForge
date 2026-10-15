@@ -475,75 +475,55 @@
       const triggerTime = Date.now();
       let sec = 0;
       let pct = 20;
-      let targetRunId = null;
 
       const timer = setInterval(async () => {
         sec += 5;
-        if (pct < 92) {
+        if (pct < 95) {
           pct += Math.floor(Math.random() * 2) + 1;
         }
         pBar.style.width = pct + '%';
         pctLabel.innerText = `${pct}% (${sec}s)`;
         stLabel.innerText = "Compiling Android APK... Please wait 2-3 mins";
 
-        try {
-          if (!targetRunId) {
-            const runCheck = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/build-apk.yml/runs?per_page=1&_t=${Date.now()}`);
-            if (runCheck.ok) {
-              const runData = await runCheck.json();
-              const latestRun = runData.workflow_runs?.[0];
-              if (latestRun && new Date(latestRun.created_at).getTime() >= (triggerTime - 15000)) {
-                targetRunId = latestRun.id;
-              }
-            }
-          }
+        // Poll releases after 60 seconds of build initiation
+        if (sec >= 60) {
+          try {
+            const relRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=1&_t=${Date.now()}`);
+            if (relRes.ok) {
+              const relList = await relRes.json();
+              if (relList && relList.length > 0) {
+                const latestRel = relList[0];
+                const apk = latestRel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
 
-          if (targetRunId) {
-            const statusCheck = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs/${targetRunId}?_t=${Date.now()}`);
-            if (statusCheck.ok) {
-              const runDetail = await statusCheck.json();
-
-              if (runDetail.status === 'completed') {
-                if (runDetail.conclusion === 'success') {
-                  const relCheck = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=1&_t=${Date.now()}`);
-                  if (relCheck.ok) {
-                    const relList = await relCheck.json();
-                    const latestRelease = relList?.[0];
-                    const apk = latestRelease?.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
-
-                    if (apk) {
-                      clearInterval(timer);
-                      pBar.style.width = '100%';
-                      pBar.style.background = '#10b981';
-                      pctLabel.innerText = '100%';
-                      stLabel.innerText = 'Build Successful!';
-                      dlBtn.href = apk.browser_download_url;
-                      dlBtn.innerText = `Install / Download ${apk.name}`;
-                      dlWrap.classList.remove('hidden');
-                      buildBtn.disabled = false;
-                      buildBtn.classList.remove('opacity-50');
-                      return;
-                    }
-                  }
-                } else {
+                // Verify release timestamp is newer than trigger time
+                const relTime = new Date(latestRel.created_at).getTime();
+                if (apk && relTime >= (triggerTime - 60000)) {
                   clearInterval(timer);
                   pBar.style.width = '100%';
-                  pBar.style.background = '#ef4444';
-                  stLabel.innerText = 'Build Failed! Please check actions.';
+                  pBar.style.background = '#10b981';
+                  pctLabel.innerText = '100%';
+                  stLabel.innerText = 'Build Successful!';
+                  dlBtn.href = apk.browser_download_url;
+                  dlBtn.innerText = `Install / Download ${apk.name}`;
+                  dlWrap.classList.remove('hidden');
                   buildBtn.disabled = false;
                   buildBtn.classList.remove('opacity-50');
                   return;
                 }
               }
             }
+          } catch (e) {
+            console.error(e);
           }
-        } catch (e) {
-          console.error(e);
         }
 
-        if (sec > 300) {
+        // Handle timeout after 4 minutes
+        if (sec > 260) {
           clearInterval(timer);
-          stLabel.innerText = 'Build Timeout! Check GitHub Actions.';
+          stLabel.innerText = 'Build finished! Check GitHub Releases.';
+          dlBtn.href = `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases`;
+          dlBtn.innerText = 'Open GitHub Releases to Download';
+          dlWrap.classList.remove('hidden');
           buildBtn.disabled = false;
           buildBtn.classList.remove('opacity-50');
         }
