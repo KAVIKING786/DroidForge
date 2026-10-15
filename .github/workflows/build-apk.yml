@@ -30,7 +30,7 @@ jobs:
           cordova create myApp ${{ github.event.inputs.package_id }} "${{ github.event.inputs.app_name }}"
           cd myApp
           cordova platform add android
-                    # Decode HTML content safely first
+          # Decode HTML content safely first
           mkdir -p www
           echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html
 
@@ -62,24 +62,31 @@ jobs:
           sed -i '/<\/widget>/i <preference name="AllowInlineMediaPlayback" value="true" />' config.xml
 
           find platforms/android -name "*.gradle" -type f -exec sed -i 's|jcenter()|google()\n  mavenCentral()|g' {} +
-        
-        
+
       - name: Build Standalone APK
         run: |
           cd myApp
-          export GRADLE_OPTS="-Dhttps.protocols=TLSv1.2 -Dorg.gradle.daemon=false"
+          # Modern WebView Flags for AI, WebGL, 3D/Canvas, Audio/Video & Camera
+          sed -i '/<\/widget>/i <preference name="android-hardwareAccelerated" value="true" />' config.xml
+          sed -i '/<\/widget>/i <preference name="AllowInlineMediaPlayback" value="true" />' config.xml
+          sed -i '/<\/widget>/i <preference name="MixedContentMode" value="0" />' config.xml
 
-          cordova build android --debug 
-          SAFE_APP_NAME=$(echo "${{ github.event.inputs.app_name }}" | tr -dc '[:alnum:]_')
-          if [ -z "$SAFE_APP_NAME" ]; then SAFE_APP_NAME="CustomApp"; fi
-          mv platforms/android/app/build/outputs/apk/debug/app-debug.apk platforms/android/app/build/outputs/apk/debug/${SAFE_APP_NAME}.apk
+          # Fast Build Execution
+          cordova build android --debug -- --gradleArg=--no-daemon
 
+          # Real Safe Dynamic App Name Extraction
+          RAW_NAME="${{ github.event.inputs.app_name }}"
+          SAFE_NAME=$(echo "$RAW_NAME" | tr -dc '[:alnum:]_')
+          if [ -z "$SAFE_NAME" ]; then SAFE_NAME="DroidApp"; fi
+
+          # Dynamically scaled APK naming
+          mv platforms/android/app/build/outputs/apk/debug/app-debug.apk "platforms/android/app/build/outputs/apk/debug/${SAFE_NAME}.apk"
 
       - name: Publish Direct Public Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.run_number }}-${{ github.run_id }}
+          tag_name: build-${{ github.run_number }}-${{ github.run_id }}
           name: "Release ${{ github.event.inputs.app_name }}"
           files: myApp/platforms/android/app/build/outputs/apk/debug/*.apk
         env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
