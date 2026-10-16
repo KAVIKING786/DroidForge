@@ -426,7 +426,7 @@
     }
   }
 
-  async function runBuildPipeline() {
+    async function runBuildPipeline() {
     const appName = document.getElementById('appName').value.trim() || 'MyAwesomeApp';
     const packageId = document.getElementById('packageId').value.trim() || 'com.droidforge.app';
     let codeToPack = '';
@@ -483,33 +483,84 @@
         pctLabel.innerText = `${pct}% (${sec}s)`;
         stLabel.innerText = "Processing Ultra-Fast APK Engine...";
 
-        // Start checking releases directly after 35 seconds
-        if (sec >= 35) {
+        // Start checking releases directly after 25 seconds
+        if (sec >= 25) {
           try {
-            const relRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=1&_t=${Date.now()}`);
+            const relRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=3&_t=${Date.now()}`, {
+              headers: { 'Accept': 'application/vnd.github.v3+json' }
+            });
             if (relRes.ok) {
               const relList = await relRes.json();
               if (relList && relList.length > 0) {
-                const latestRel = relList[0];
-                const apk = latestRel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
+                for (const latestRel of relList) {
+                  const apk = latestRel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
+                  const relTime = new Date(latestRel.created_at).getTime();
 
-                // Verify release timestamp is newer than trigger time
-                const relTime = new Date(latestRel.created_at).getTime();
-                if (apk && relTime >= (triggerTime - 45000)) {
-                  clearInterval(timer);
-                  pBar.style.width = '100%';
-                  pBar.style.background = '#10b981';
-                  pctLabel.innerText = '100%';
-                  stLabel.innerText = 'Build Successful!';
-                  
-                  // Direct mobile download link with real app name and size
-                  dlBtn.href = apk.browser_download_url;
-                  dlBtn.setAttribute('download', apk.name);
-                  dlBtn.innerText = `Download ${apk.name} (${(apk.size / (1024 * 1024)).toFixed(2)} MB)`;
-                  dlWrap.classList.remove('hidden');
-                  buildBtn.disabled = false;
-                  buildBtn.classList.remove('opacity-50');
-                  return;
+                  if (apk && relTime >= (triggerTime - 120000)) {
+                    clearInterval(timer);
+                    pBar.style.width = '100%';
+                    pBar.style.background = '#10b981';
+                    pctLabel.innerText = '100%';
+                    
+                    const fileSizeMB = (apk.size / (1024 * 1024)).toFixed(2);
+                    stLabel.innerText = `Build Successful! (${fileSizeMB} MB)`;
+
+                    dlWrap.classList.remove('hidden');
+                    dlBtn.innerText = `📥 Direct Download ${apk.name} (${fileSizeMB} MB)`;
+                    
+                    // Direct Mobile Download without opening GitHub page
+                    dlBtn.onclick = async function(e) {
+                      e.preventDefault();
+                      dlBtn.innerText = `⏳ Downloading to Mobile (0%)...`;
+                      dlBtn.style.pointerEvents = 'none';
+                      
+                      try {
+                        const corsProxy = "https://corsproxy.io/?";
+                        const response = await fetch(corsProxy + encodeURIComponent(apk.browser_download_url));
+                        if (!response.ok) throw new Error("Direct stream fallback");
+
+                        const reader = response.body.getReader();
+                        const contentLength = +apk.size;
+                        let receivedLength = 0;
+                        let chunks = [];
+
+                        while(true) {
+                          const {done, value} = await reader.read();
+                          if (done) break;
+                          chunks.push(value);
+                          receivedLength += value.length;
+                          let dlPct = Math.round((receivedLength / contentLength) * 100);
+                          dlBtn.innerText = `⏳ Downloading... ${dlPct}% (${fileSizeMB} MB)`;
+                        }
+
+                        const blob = new Blob(chunks, { type: 'application/vnd.android.package-archive' });
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        
+                        const tempLink = document.createElement('a');
+                        tempLink.style.display = 'none';
+                        tempLink.href = blobUrl;
+                        tempLink.setAttribute('download', apk.name);
+                        document.body.appendChild(tempLink);
+                        tempLink.click();
+                        
+                        setTimeout(() => {
+                          window.URL.revokeObjectURL(blobUrl);
+                          tempLink.remove();
+                        }, 3000);
+
+                        dlBtn.innerText = `✅ Downloaded ${apk.name} (${fileSizeMB} MB)`;
+                        dlBtn.style.pointerEvents = 'auto';
+                      } catch (streamErr) {
+                        window.location.assign(apk.browser_download_url);
+                        dlBtn.innerText = `📥 Download Started (${fileSizeMB} MB)`;
+                        dlBtn.style.pointerEvents = 'auto';
+                      }
+                    };
+
+                    buildBtn.disabled = false;
+                    buildBtn.classList.remove('opacity-50');
+                    return;
+                  }
                 }
               }
             }
@@ -518,15 +569,14 @@
           }
         }
 
-        // Handle timeout after 3 minutes
-        if (sec > 180) {
+        // Handle timeout after 3.5 minutes
+        if (sec > 210) {
           clearInterval(timer);
           stLabel.innerText = 'Build Timeout! Please try again.';
           buildBtn.disabled = false;
           buildBtn.classList.remove('opacity-50');
         }
       }, 4000);
-
 
     } catch (err) {
       alert(err.message);
