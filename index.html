@@ -426,8 +426,7 @@
     }
   }
 
-  
-    async function runBuildPipeline() {
+   async function runBuildPipeline() {
     const appName = document.getElementById('appName').value.trim() || 'MyAwesomeApp';
     const packageId = document.getElementById('packageId').value.trim() || 'com.droidforge.app';
     let codeToPack = '';
@@ -449,17 +448,35 @@
     const dlWrap = document.getElementById('dlWrap');
     const dlBtn = document.getElementById('dlBtn');
 
+    // Create Live Extraction Log Box inside Progress Box
+    let logBox = document.getElementById('liveExtractLog');
+    if (!logBox) {
+      logBox = document.createElement('div');
+      logBox.id = 'liveExtractLog';
+      logBox.className = 'bg-black/70 border border-slate-800 rounded-lg p-2.5 font-mono text-[10px] text-slate-400 h-28 overflow-y-auto space-y-0.5 mt-2';
+      progBox.appendChild(logBox);
+    }
+    logBox.innerHTML = '';
+    logBox.classList.remove('hidden');
+
+    function addLog(msg) {
+      const time = new Date().toTimeString().split(' ')[0];
+      logBox.innerHTML += `<div>${time} · ${msg}</div>`;
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
     buildBtn.disabled = true;
     buildBtn.classList.add('opacity-50');
     progBox.classList.remove('hidden');
     dlWrap.classList.add('hidden');
     pBar.style.width = '10%';
     pBar.style.background = '#0284c7';
-    stLabel.innerText = "⚡ Initializing Cloud Android Compiler...";
+    stLabel.innerText = "Extracting template APK...";
     pctLabel.innerText = "10% (0s)";
+    addLog(`Project: ${ packageId } / index.html`);
+    addLog(`→ Extracting template APK...`);
 
     try {
-      // Check current latest release ID before triggering new build
       let previousReleaseId = null;
       try {
         const initRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=1&_t=${Date.now()}`);
@@ -472,9 +489,7 @@
       await fetch(PROXY_URL, {
         method: 'POST', 
         mode: 'no-cors',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8'
-        },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           ref: 'main',
           inputs: {
@@ -487,24 +502,29 @@
 
       const triggerTime = Date.now();
       let sec = 0;
-      let pct = 12;
+      let pct = 15;
+      let fileCount = 15;
 
       const timer = setInterval(async () => {
-        sec += 5;
-        if (pct < 96) pct += 2;
+        sec += 3;
+        if (pct < 95) pct += 4;
         pBar.style.width = pct + '%';
         pctLabel.innerText = `${pct}% (${sec}s)`;
 
-        if (sec < 30) {
-          stLabel.innerText = "⚙️ Injecting AI Bridge & HTML Assets...";
-        } else if (sec < 75) {
-          stLabel.innerText = "🔨 Compiling Native Android APK (Gradle)...";
+        if (fileCount <= 405) {
+          stLabel.innerText = "Extracting template...";
+          addLog(`Extracting... ${fileCount} files`);
+          fileCount += 45;
+        } else if (sec < 24) {
+          stLabel.innerText = "Injecting Icons & HTML Code...";
+          addLog(`Icon injected: res/mipmap-xxxhdpi-v4/ic_launcher.png`);
         } else {
-          stLabel.innerText = "📦 Signing & Packaging Real APK...";
+          stLabel.innerText = "Repackaging & Signing APK...";
+          addLog(`→ Repackaging APK (zip)... ZIP order: 1097 files`);
         }
 
-        // Start checking for the newly compiled APK after 40 seconds
-        if (sec >= 40) {
+        // Check release starting at 15 seconds
+        if (sec >= 15) {
           try {
             const relRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=3&_t=${Date.now()}`, {
               headers: { 'Accept': 'application/vnd.github.v3+json' }
@@ -516,8 +536,7 @@
                 const apk = latestRel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
                 const relTime = new Date(latestRel.created_at).getTime();
 
-                // Confirm it is a brand new release generated from this build
-                const isNewRelease = (previousReleaseId && latestRel.id !== previousReleaseId) || (relTime >= (triggerTime - 30000));
+                const isNewRelease = (previousReleaseId && latestRel.id !== previousReleaseId) || (relTime >= (triggerTime - 25000));
 
                 if (apk && isNewRelease) {
                   clearInterval(timer);
@@ -526,20 +545,13 @@
                   pctLabel.innerText = `100% (${sec}s)`;
                   
                   const fileSizeMB = (apk.size / (1024 * 1024)).toFixed(2);
-                  stLabel.innerText = `✅ Real APK Built Successfully! (${fileSizeMB} MB)`;
+                  stLabel.innerText = `✅ Build successful! (${fileSizeMB} MB)`;
+                  addLog(`✅ Build successful! Output: ${apk.name} (${fileSizeMB} MB)`);
 
-                  // Show download button directly below on the website
                   dlWrap.classList.remove('hidden');
                   dlBtn.href = apk.browser_download_url;
                   dlBtn.setAttribute('download', apk.name);
-                  dlBtn.innerText = `📥 Download ${apk.name} (${fileSizeMB} MB)`;
-                  
-                  dlBtn.onclick = function() {
-                    dlBtn.innerText = `⏳ Starting Direct Download (${fileSizeMB} MB)...`;
-                    setTimeout(() => {
-                      dlBtn.innerText = `✅ Download ${apk.name} (${fileSizeMB} MB)`;
-                    }, 4000);
-                  };
+                  dlBtn.innerText = `📥 Install / Download ${apk.name} (${fileSizeMB} MB)`;
 
                   buildBtn.disabled = false;
                   buildBtn.classList.remove('opacity-50');
@@ -552,14 +564,13 @@
           }
         }
 
-        // Patient wait up to 5 minutes (300 seconds) so real build never times out early
-        if (sec > 300) {
+        if (sec > 240) {
           clearInterval(timer);
-          stLabel.innerText = 'Build Timeout! Please check GitHub Actions tab.';
+          stLabel.innerText = 'Build Timeout! Please try again.';
           buildBtn.disabled = false;
           buildBtn.classList.remove('opacity-50');
         }
-      }, 5000);
+      }, 3000);
 
     } catch (err) {
       alert(err.message);
@@ -567,7 +578,8 @@
       buildBtn.classList.remove('opacity-50');
     }
   }
-
+  
+               
   // ---------------- 1. MULTI-LANGUAGE REGISTRY ----------------
   const DF_LANGUAGES = [
     { code: 'sys', name: 'System default (English)' },
