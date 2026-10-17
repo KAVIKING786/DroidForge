@@ -33,7 +33,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
+          
 
       - name: Configure Pre-Installed Android SDK & Build Project
         run: |
