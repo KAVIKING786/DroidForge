@@ -18,7 +18,7 @@ on:
 
 jobs:
   build-apk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
 
@@ -33,15 +33,17 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Enable Gradle Cache for Fast 1-Minute Build
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Create & Configure Real Android Project
+      - name: Configure Pre-Installed Android SDK & Build Project
         run: |
+          # Use GitHub's pre-installed Android SDK directly (No setup-android error)
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
+          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+
           npm install -g cordova
 
           # Extract and sanitize Package ID and App Name
@@ -118,6 +120,7 @@ jobs:
       - name: Compile Real Standalone APK
         run: |
           cd myApp
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
           cordova build android -- --gradleArg=--no-daemon
 
           RAW_NAME="${{ github.event.inputs.app_name }}"
