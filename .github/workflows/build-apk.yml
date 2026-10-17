@@ -33,20 +33,22 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          
+
+      - name: Setup Compatible Gradle 8.7
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
 
       - name: Configure Pre-Installed Android SDK & Build Project
         run: |
-          # Use GitHub's pre-installed Android SDK directly (No setup-android error)
           export ANDROID_HOME=$ANDROID_SDK_ROOT
           export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
           yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
           npm install -g cordova
 
-          # Extract and sanitize Package ID and App Name
           PKG_ID=$(echo "${{ github.event.inputs.package_id }}" | tr -dc '[:alnum:]._')
           if [[ ! "$PKG_ID" =~ ^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)+$ ]]; then
             PKG_ID="com.droidforge.customapp"
@@ -54,7 +56,7 @@ jobs:
 
           cordova create myApp "$PKG_ID" "${{ github.event.inputs.app_name }}"
           cd myApp
-          cordova platform add android@12.0.1
+          cordova platform add android@13.0.0
 
           mkdir -p www
           echo "${{ github.event.inputs.html_content }}" | base64 -d > www/user_code.html
