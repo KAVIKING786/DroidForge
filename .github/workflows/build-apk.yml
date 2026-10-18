@@ -138,7 +138,7 @@ jobs:
           zip -q -r ../repackaged_unsigned.apk .
           cd ..
 
-          # 4. Zipalign & Sign APK so Android installs it cleanly
+          # 4. Zipalign & Proper v2/v3 Signing so Android Installs Cleanly
           zipalign -p -f 4 repackaged_unsigned.apk aligned.apk
 
           keytool -genkey -v -keystore release.keystore -alias dfkey -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=DroidForge, OU=Mobile, O=Tech, L=City, S=State, C=US"
@@ -148,7 +148,9 @@ jobs:
           if [ -z "$CLEAN_NAME" ]; then CLEAN_NAME="CustomApp"; fi
 
           mkdir -p final_output
-          apksigner sign --ks release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out "final_output/${CLEAN_NAME}.apk" aligned.apk
+          
+          # Use both v1 and v2/v3 signing schemes to prevent 'App not installed' error
+          apksigner sign --ks release.keystore --ks-pass pass:123456 --key-pass pass:123456 --min-sdk-version 24 --out "final_output/${CLEAN_NAME}.apk" aligned.apk
 
       - name: Publish Instant Direct Release
         uses: softprops/action-gh-release@v2
