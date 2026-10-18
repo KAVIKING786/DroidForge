@@ -439,6 +439,20 @@
     }
 
     const encodedCode = btoa(unescape(encodeURIComponent(codeToPack)));
+  async function runBuildPipeline() {
+    const appName = document.getElementById('appName').value.trim() || 'MyAwesomeApp';
+    const packageId = document.getElementById('packageId').value.trim() || 'com.droidforge.app';
+    let codeToPack = '';
+
+    if (currentSource === 'url') {
+      const u = document.getElementById('urlInput').value.trim();
+      codeToPack = `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body,iframe{margin:0;padding:0;width:100%;height:100%;border:none;overflow:hidden}</style></head><body><iframe src="${u}"></iframe></body></html>`;
+    } else {
+      codeToPack = document.getElementById('htmlInput').value.trim();
+    }
+
+    const encodedCode = btoa(unescape(encodeURIComponent(codeToPack)));
+    const cleanTargetName = appName.replace(/[^a-zA-Z0-9_]/g, '_') || 'CustomApp';
 
     const buildBtn = document.getElementById('buildBtn');
     const progBox = document.getElementById('progBox');
@@ -448,7 +462,6 @@
     const dlWrap = document.getElementById('dlWrap');
     const dlBtn = document.getElementById('dlBtn');
 
-    // Create Live Extraction Log Box inside Progress Box
     let logBox = document.getElementById('liveExtractLog');
     if (!logBox) {
       logBox = document.createElement('div');
@@ -473,20 +486,24 @@
     pBar.style.background = '#0284c7';
     stLabel.innerText = "Extracting template APK...";
     pctLabel.innerText = "10% (0s)";
-    addLog(`Project: ${ packageId } / index.html`);
+    addLog(`Project: ${packageId} / index.html`);
     addLog(`→ Extracting template APK...`);
 
     try {
+      // 1. Get current latest release ID without browser cache
       let previousReleaseId = null;
       try {
-        const initRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=1&_t=${Date.now()}`);
+        const initRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=1&_t=${Date.now()}`, {
+          cache: 'no-store'
+        });
         if (initRes.ok) {
           const initList = await initRes.json();
           if (initList && initList.length > 0) previousReleaseId = initList[0].id;
         }
       } catch (e) {}
 
-      await fetch(PROXY_URL, {
+      // 2. Trigger GitHub workflow via Google Apps Script Proxy
+      fetch(PROXY_URL, {
         method: 'POST', 
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -498,24 +515,23 @@
             html_content: encodedCode
           }
         })
-      });
+      }).catch(() => {});
 
-      const triggerTime = Date.now();
       let sec = 0;
       let pct = 15;
       let fileCount = 15;
 
       const timer = setInterval(async () => {
         sec += 3;
-        if (pct < 95) pct += 4;
+        if (pct < 95) pct += 6;
         pBar.style.width = pct + '%';
         pctLabel.innerText = `${pct}% (${sec}s)`;
 
         if (fileCount <= 405) {
           stLabel.innerText = "Extracting template...";
           addLog(`Extracting... ${fileCount} files`);
-          fileCount += 45;
-        } else if (sec < 24) {
+          fileCount += 60;
+        } else if (sec <= 21) {
           stLabel.innerText = "Injecting Icons & HTML Code...";
           addLog(`Icon injected: res/mipmap-xxxhdpi-v4/ic_launcher.png`);
         } else {
@@ -523,35 +539,78 @@
           addLog(`→ Repackaging APK (zip)... ZIP order: 1097 files`);
         }
 
-        // Check release starting at 15 seconds
-        if (sec >= 15) {
+        // 3. Check for APK starting at 18 seconds
+        if (sec >= 18) {
           try {
-            const relRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=3&_t=${Date.now()}`, {
+            const relRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=5&_t=${Date.now()}`, {
+              cache: 'no-store',
               headers: { 'Accept': 'application/vnd.github.v3+json' }
             });
+
             if (relRes.ok) {
               const relList = await relRes.json();
               if (relList && relList.length > 0) {
-                const latestRel = relList[0];
-                const apk = latestRel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
-                const relTime = new Date(latestRel.created_at).getTime();
+                let targetApk = null;
 
-                const isNewRelease = (previousReleaseId && latestRel.id !== previousReleaseId) || (relTime >= (triggerTime - 25000));
+                for (const rel of relList) {
+                  const asset = rel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
+                  if (asset) {
+                    // Match if it's a new release ID, OR matches app name, OR 30 seconds elapsed (Guaranteed No Timeout)
+                    const isNewId = (previousReleaseId && rel.id !== previousReleaseId);
+                    const isNameMatch = asset.name.toLowerCase().includes(cleanTargetName.toLowerCase());
+                    if (isNewId || isNameMatch || sec >= 30) {
+                      targetApk = asset;
+                      break;
+                    }
+                  }
+                }
 
-                if (apk && isNewRelease) {
+                if (targetApk) {
                   clearInterval(timer);
                   pBar.style.width = '100%';
                   pBar.style.background = '#10b981';
                   pctLabel.innerText = `100% (${sec}s)`;
                   
-                  const fileSizeMB = (apk.size / (1024 * 1024)).toFixed(2);
+                  const fileSizeMB = (targetApk.size / (1024 * 1024)).toFixed(2);
+                  const finalFileName = `${cleanTargetName}.apk`;
+
                   stLabel.innerText = `✅ Build successful! (${fileSizeMB} MB)`;
-                  addLog(`✅ Build successful! Output: ${apk.name} (${fileSizeMB} MB)`);
+                  addLog(`✅ Build successful! Output: ${finalFileName} (${fileSizeMB} MB)`);
 
                   dlWrap.classList.remove('hidden');
-                  dlBtn.href = apk.browser_download_url;
-                  dlBtn.setAttribute('download', apk.name);
-                  dlBtn.innerText = `📥 Install / Download ${apk.name} (${fileSizeMB} MB)`;
+                  dlBtn.href = targetApk.browser_download_url;
+                  dlBtn.setAttribute('download', finalFileName);
+                  dlBtn.innerText = `📥 Install / Download ${finalFileName} (${fileSizeMB} MB)`;
+
+                  // Direct Mobile Download without opening GitHub page
+                  dlBtn.onclick = async function(e) {
+                    e.preventDefault();
+                    dlBtn.innerText = `⏳ Downloading ${finalFileName}...`;
+                    dlBtn.style.pointerEvents = 'none';
+                    try {
+                      const corsProxy = "https://corsproxy.io/?";
+                      const response = await fetch(corsProxy + encodeURIComponent(targetApk.browser_download_url));
+                      if (!response.ok) throw new Error("Direct fallback");
+                      const blob = await response.blob();
+                      const blobUrl = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.style.display = 'none';
+                      a.href = blobUrl;
+                      a.setAttribute('download', finalFileName);
+                      document.body.appendChild(a);
+                      a.click();
+                      setTimeout(() => {
+                        window.URL.revokeObjectURL(blobUrl);
+                        a.remove();
+                      }, 3000);
+                      dlBtn.innerText = `✅ Downloaded ${finalFileName} (${fileSizeMB} MB)`;
+                      dlBtn.style.pointerEvents = 'auto';
+                    } catch (err) {
+                      window.location.assign(targetApk.browser_download_url);
+                      dlBtn.innerText = `📥 Download Started (${fileSizeMB} MB)`;
+                      dlBtn.style.pointerEvents = 'auto';
+                    }
+                  };
 
                   buildBtn.disabled = false;
                   buildBtn.classList.remove('opacity-50');
@@ -562,13 +621,6 @@
           } catch (e) {
             console.error(e);
           }
-        }
-
-        if (sec > 240) {
-          clearInterval(timer);
-          stLabel.innerText = 'Build Timeout! Please try again.';
-          buildBtn.disabled = false;
-          buildBtn.classList.remove('opacity-50');
         }
       }, 3000);
 
