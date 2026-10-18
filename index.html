@@ -26,21 +26,21 @@
     <p class="text-xs text-slate-400">No Watermark • 100% Free Real APK Builder</p>
   </div>
 
-   <!-- Navigation Tabs (Centered & Equal Width) -->
-    <div class="flex items-center justify-center gap-1.5 p-1 bg-[#12161f] border border-slate-800 rounded-xl mb-6">
-      <button id="tabProjectBtn" onclick="switchTab('project')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 tab-active">
-        🛠️ Project Info
-      </button>
-      <button id="tabTplBtn" onclick="switchTab('tpl')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 text-slate-400">
-        📁 Templates
-      </button>
-      <button id="tabHwBtn" onclick="switchTab('hw')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 text-slate-400">
-        ⚙️ Settings
-      </button>
-    </div>
+  <!-- Navigation Tabs -->
+  <div class="flex items-center justify-center gap-1.5 p-1 bg-[#12161f] border border-slate-800 rounded-xl mb-6">
+    <button id="tabProjectBtn" onclick="switchTab('project')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 tab-active">
+      🛠️ Project Info
+    </button>
+    <button id="tabTplBtn" onclick="switchTab('tpl')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 text-slate-400">
+      📁 Templates
+    </button>
+    <button id="tabHwBtn" onclick="switchTab('hw')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 text-slate-400">
+      ⚙️ Settings
+    </button>
+  </div>
 
-    <!-- Main Container -->
-    <div class="bg-[#111622] border border-[#1e2638] rounded-2xl p-5 shadow-2xl space-y-4">
+  <!-- Main Container -->
+  <div class="bg-[#111622] border border-[#1e2638] rounded-2xl p-5 shadow-2xl space-y-4">
 
     <div id="tabProject" class="space-y-4">
 
@@ -304,7 +304,7 @@
     </div>
 
     <!-- Main Action Button -->
-    <button id="buildBtn" onclick="runBuildPipeline()" class="w-full bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2">
+    <button id="buildBtn" type="button" onclick="runBuildPipeline()" class="w-full bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2">
       🚀 Build Real Clean Package (100% Free)
     </button>
 
@@ -426,19 +426,19 @@
     }
   }
 
-   async function runBuildPipeline() {
-    const appName = document.getElementById('appName').value.trim() || 'MyAwesomeApp';
-    const packageId = document.getElementById('packageId').value.trim() || 'com.droidforge.app';
-    let codeToPack = '';
-
-    if (currentSource === 'url') {
-      const u = document.getElementById('urlInput').value.trim();
-      codeToPack = `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body,iframe{margin:0;padding:0;width:100%;height:100%;border:none;overflow:hidden}</style></head><body><iframe src="${u}"></iframe></body></html>`;
-    } else {
-      codeToPack = document.getElementById('htmlInput').value.trim();
+  function safeBase64Encode(str) {
+    try {
+      const bytes = new TextEncoder().encode(str);
+      let binString = "";
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binString += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binString);
+    } catch (e) {
+      return btoa(unescape(encodeURIComponent(str)));
     }
+  }
 
-    const encodedCode = btoa(unescape(encodeURIComponent(codeToPack)));
   async function runBuildPipeline() {
     const appName = document.getElementById('appName').value.trim() || 'MyAwesomeApp';
     const packageId = document.getElementById('packageId').value.trim() || 'com.droidforge.app';
@@ -451,7 +451,7 @@
       codeToPack = document.getElementById('htmlInput').value.trim();
     }
 
-    const encodedCode = btoa(unescape(encodeURIComponent(codeToPack)));
+    const encodedCode = safeBase64Encode(codeToPack);
     const cleanTargetName = appName.replace(/[^a-zA-Z0-9_]/g, '_') || 'CustomApp';
 
     const buildBtn = document.getElementById('buildBtn');
@@ -487,10 +487,9 @@
     stLabel.innerText = "Extracting template APK...";
     pctLabel.innerText = "10% (0s)";
     addLog(`Project: ${packageId} / index.html`);
-    addLog(`→ Extracting template APK...`);
+    addLog(`-> Extracting template APK...`);
 
     try {
-      // 1. Get current latest release ID without browser cache
       let previousReleaseId = null;
       try {
         const initRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=1&_t=${Date.now()}`, {
@@ -502,7 +501,6 @@
         }
       } catch (e) {}
 
-      // 2. Trigger GitHub workflow via Google Apps Script Proxy
       fetch(PROXY_URL, {
         method: 'POST', 
         mode: 'no-cors',
@@ -536,10 +534,9 @@
           addLog(`Icon injected: res/mipmap-xxxhdpi-v4/ic_launcher.png`);
         } else {
           stLabel.innerText = "Repackaging & Signing APK...";
-          addLog(`→ Repackaging APK (zip)... ZIP order: 1097 files`);
+          addLog(`-> Repackaging APK (zip)... ZIP order: 1097 files`);
         }
 
-        // 3. Check for APK starting at 18 seconds
         if (sec >= 18) {
           try {
             const relRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=5&_t=${Date.now()}`, {
@@ -555,7 +552,6 @@
                 for (const rel of relList) {
                   const asset = rel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
                   if (asset) {
-                    // Match if it's a new release ID, OR matches app name, OR 30 seconds elapsed (Guaranteed No Timeout)
                     const isNewId = (previousReleaseId && rel.id !== previousReleaseId);
                     const isNameMatch = asset.name.toLowerCase().includes(cleanTargetName.toLowerCase());
                     if (isNewId || isNameMatch || sec >= 30) {
@@ -582,7 +578,6 @@
                   dlBtn.setAttribute('download', finalFileName);
                   dlBtn.innerText = `📥 Install / Download ${finalFileName} (${fileSizeMB} MB)`;
 
-                  // Direct Mobile Download without opening GitHub page
                   dlBtn.onclick = async function(e) {
                     e.preventDefault();
                     dlBtn.innerText = `⏳ Downloading ${finalFileName}...`;
@@ -630,8 +625,7 @@
       buildBtn.classList.remove('opacity-50');
     }
   }
-  
-               
+
   // ---------------- 1. MULTI-LANGUAGE REGISTRY ----------------
   const DF_LANGUAGES = [
     { code: 'sys', name: 'System default (English)' },
@@ -647,7 +641,7 @@
   ];
 
   // ---------------- 2. THEMES REGISTRY ----------------
-   const DF_THEMES = [
+  const DF_THEMES = [
     { id: 'dark', name: 'Default Dark (GitHub Slate)', bg: '#0d1117', card: '#161b22', border: '#30363d', text: '#c9d1d9', accent: '#0284c7' },
     { id: 'amoled', name: 'Pure AMOLED (Pitch Black)', bg: '#000000', card: '#0a0a0a', border: '#222222', text: '#f3f4f6', accent: '#38bdf8' },
     { id: 'sky', name: 'Deep Ocean (Midnight Navy)', bg: '#051329', card: '#0a2244', border: '#1e3a8a', text: '#e0f2fe', accent: '#0284c7' },
@@ -818,7 +812,7 @@
     openDfModal("Select Theme", html, false);
   }
 
-    function applyTheme(themeId) {
+  function applyTheme(themeId) {
     const selected = DF_THEMES.find(t => t.id === themeId);
     if (!selected) return;
 
