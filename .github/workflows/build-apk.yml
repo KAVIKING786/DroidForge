@@ -120,7 +120,7 @@ jobs:
             git push || true
           fi
 
-          # 3. FAST EXTRACT & REPACKAGE (Fixed Zip Command)
+          # 3. FAST EXTRACT & REPACKAGE (Direct Clean Zip)
           echo "Extracting template APK..."
           mkdir -p extracted_apk
           unzip -q template.apk -d extracted_apk
@@ -129,13 +129,13 @@ jobs:
           mkdir -p extracted_apk/assets/www
           cp -r payload/assets/www/* extracted_apk/assets/www/
 
-          # Remove old signature before repackaging
+          # Remove old signature and previous zip
           rm -rf extracted_apk/META-INF
           rm -f repackaged_unsigned.apk
 
-          echo "Repackaging APK..."
+          echo "Repackaging APK cleanly..."
           cd extracted_apk
-          zip -9 -r ../repackaged_unsigned.apk . > /dev/null
+          zip -q -r ../repackaged_unsigned.apk .
           cd ..
 
           # 4. Zipalign & Sign APK so Android installs it cleanly
