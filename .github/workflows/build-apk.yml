@@ -120,8 +120,9 @@ jobs:
             git push || true
           fi
 
-          # 3. FAST EXTRACT & REPACKAGE (Direct Clean Zip)
+          # 3. FAST EXTRACT & REPACKAGE (Android 11-14 Compatible Uncompressed resources.arsc)
           echo "Extracting template APK..."
+          rm -rf extracted_apk repackaged_unsigned.apk aligned.apk final_output
           mkdir -p extracted_apk
           unzip -q template.apk -d extracted_apk
 
@@ -129,18 +130,19 @@ jobs:
           mkdir -p extracted_apk/assets/www
           cp -r payload/assets/www/* extracted_apk/assets/www/
 
-          # Remove old signature and previous zip
+          # Remove old signature before repackaging
           rm -rf extracted_apk/META-INF
-          rm -f repackaged_unsigned.apk
 
-          echo "Repackaging APK cleanly..."
+          echo "Repackaging APK without compressing resources.arsc..."
           cd extracted_apk
-          zip -q -r ../repackaged_unsigned.apk .
+          # CRITICAL FIX: Keep resources.arsc and native libs uncompressed (-0 / -n) so Android 11+ installs it!
+          zip -q -r ../repackaged_unsigned.apk . -n resources.arsc:.so:.png:.webp:.mp3:.mp4:.bin
           cd ..
 
-          # 4. Zipalign & Proper v2/v3 Signing so Android Installs Cleanly
-          zipalign -p -f 4 repackaged_unsigned.apk aligned.apk
+          # 4. Zipalign (4-byte alignment on uncompressed resources.arsc) & Full v1/v2/v3 Signing
+          zipalign -p -f -v 4 repackaged_unsigned.apk aligned.apk > /dev/null
 
+          rm -f release.keystore
           keytool -genkey -v -keystore release.keystore -alias dfkey -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=DroidForge, OU=Mobile, O=Tech, L=City, S=State, C=US"
 
           RAW_NAME="${{ github.event.inputs.app_name }}"
@@ -149,8 +151,7 @@ jobs:
 
           mkdir -p final_output
           
-          # Use both v1 and v2/v3 signing schemes to prevent 'App not installed' error
-          apksigner sign --ks release.keystore --ks-pass pass:123456 --key-pass pass:123456 --min-sdk-version 24 --out "final_output/${CLEAN_NAME}.apk" aligned.apk
+          apksigner sign --ks release.keystore --ks-pass pass:123456 --key-pass pass:123456 --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --out "final_output/${CLEAN_NAME}.apk" aligned.apk
 
       - name: Publish Instant Direct Release
         uses: softprops/action-gh-release@v2
@@ -160,3 +161,4 @@ jobs:
           files: final_output/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
