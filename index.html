@@ -552,16 +552,17 @@
           for (const rel of relList) {
           const asset = rel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
           if (asset) {
-            const isNewId = (previousReleaseId && rel.id !== previousReleaseId);
+            // Force it to pick the exact newly generated custom APK file, ignoring old cached UniversalApp
             const isExactName = (asset.name.toLowerCase() === `${cleanTargetName.toLowerCase()}.apk`);
-            if (isNewId || isExactName) {
+            const isFreshBuild = (rel.id !== previousReleaseId);
+            if (isExactName || (isFreshBuild && asset.name.toLowerCase() !== 'universalapp.apk')) {
               targetApk = asset;
               break;
             }
           }
         }
 
-                if (targetApk) {
+                  if (targetApk) {
                   clearInterval(timer);
                   pBar.style.width = '100%';
                   pBar.style.background = '#10b981';
