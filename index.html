@@ -573,39 +573,41 @@
                   stLabel.innerText = `✅ Build successful! (${fileSizeMB} MB)`;
                   addLog(`✅ Build successful! Output: ${finalFileName} (${fileSizeMB} MB)`);
 
-                  dlWrap.classList.remove('hidden');
-                  dlBtn.href = targetApk.browser_download_url;
-                  dlBtn.setAttribute('download', finalFileName);
-                  dlBtn.innerText = `📥 Install / Download ${finalFileName} (${fileSizeMB} MB)`;
+dlWrap.classList.remove('hidden');
+// Force browser to download using the exact custom app file name
+const directDownloadUrl = targetApk.browser_download_url;
+dlBtn.href = directDownloadUrl;
+dlBtn.setAttribute('download', finalFileName);
+dlBtn.innerText = `📥 Install / Download ${finalFileName} (${fileSizeMB} MB)`;
 
-                  dlBtn.onclick = async function(e) {
-                    e.preventDefault();
-                    dlBtn.innerText = `⏳ Downloading ${finalFileName}...`;
-                    dlBtn.style.pointerEvents = 'none';
-                    try {
-                      const corsProxy = "https://corsproxy.io/?";
-                      const response = await fetch(corsProxy + encodeURIComponent(targetApk.browser_download_url));
-                      if (!response.ok) throw new Error("Direct fallback");
-                      const blob = await response.blob();
-                      const blobUrl = window.URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.style.display = 'none';
-                      a.href = blobUrl;
-                      a.setAttribute('download', finalFileName);
-                      document.body.appendChild(a);
-                      a.click();
-                      setTimeout(() => {
-                        window.URL.revokeObjectURL(blobUrl);
-                        a.remove();
-                      }, 3000);
-                      dlBtn.innerText = `✅ Downloaded ${finalFileName} (${fileSizeMB} MB)`;
-                      dlBtn.style.pointerEvents = 'auto';
-                    } catch (err) {
-                      window.location.assign(targetApk.browser_download_url);
-                      dlBtn.innerText = `📥 Download Started (${fileSizeMB} MB)`;
-                      dlBtn.style.pointerEvents = 'auto';
-                    }
-                  };
+  // Override click to force clean download with correct custom filename
+  dlBtn.onclick = async function(e) {
+  e.preventDefault();
+  dlBtn.innerText = `⏳ Downloading ${finalFileName}...`;
+  dlBtn.style.pointerEvents = 'none';
+  try {
+    const response = await fetch(directDownloadUrl);
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = blobUrl;
+    a.setAttribute('download', finalFileName);
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      window.URL.revokeObjectURL(blobUrl);
+      a.remove();
+    }, 3000);
+    dlBtn.innerText = `✅ Downloaded ${finalFileName} (${fileSizeMB} MB)`;
+    dlBtn.style.pointerEvents = 'auto';
+    } catch (err) {
+    window.location.assign(directDownloadUrl);
+    dlBtn.innerText = `📥 Download Started (${fileSizeMB} MB)`;
+    dlBtn.style.pointerEvents = 'auto';
+    }
+  };
+
 
                   buildBtn.disabled = false;
                   buildBtn.classList.remove('opacity-50');
