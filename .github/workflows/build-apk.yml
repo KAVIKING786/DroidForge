@@ -60,10 +60,10 @@ jobs:
           cd myApp
           cordova platform add android@13.0.0
 
-          # Decode User HTML content safely
+          # Decode User HTML content safely inside myApp/www directory
           mkdir -p www
-          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/user_code.html
-
+          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html
+          
           # Force overwrite Cordova default www with user HTML code directly
           rm -rf www/index.html
           mv www/user_code.html www/index.html
