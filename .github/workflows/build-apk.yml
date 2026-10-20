@@ -6,11 +6,11 @@ on:
       app_name:
         description: 'App Name'
         required: true
-        default: 'UniversalApp'
+        default: 'DroidForgeApp'
       package_id:
         description: 'Package ID'
         required: true
-        default: 'com.universal.app'
+        default: 'com.droidforge.app'
       html_content:
         description: 'Custom HTML/JS Code'
         required: true
