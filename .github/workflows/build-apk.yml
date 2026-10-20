@@ -23,19 +23,19 @@ jobs:
       contents: write
 
     steps:
-       - name: Setup Node.js
-         uses: actions/setup-node@v4
-         with:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
           node-version: '20'
 
-       - name: Setup Java JDK 17
-         uses: actions/setup-java@v4
-         with:
+      - name: Setup Java JDK 17
+        uses: actions/setup-java@v4
+        with:
           distribution: 'temurin'
           java-version: '17'
 
-       - name: Compile Real Standalone APK via Gradle
-         run: |
+      - name: Compile Real Standalone APK via Gradle
+        run: |
           # 1. Install Compatible Gradle 8.7
           wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip -P /tmp
           sudo unzip -q -d /opt/gradle /tmp/gradle-8.7-bin.zip
@@ -60,15 +60,11 @@ jobs:
           cd myApp
           cordova platform add android@13.0.0
 
-          # Decode User HTML content safely inside myApp/www directory
+          # 4. Safely Decode User HTML Content
           mkdir -p www
-          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html
-          
-          # Force overwrite Cordova default www with user HTML code directly
-          rm -rf www/index.html
-          mv www/user_code.html www/index.html
+          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/user_code.html
 
-          # 4. Inject Pre-built AI & Hardware Bridge + User Code
+          # 5. Inject Pre-built AI & Hardware Bridge + User HTML Code properly
           cat << 'EOF' > www/index.html
           <!DOCTYPE html>
           <html>
@@ -94,18 +90,18 @@ jobs:
           cat www/user_code.html >> www/index.html
           rm www/user_code.html
 
-          # 5. Dynamic MB Size Scaling based on code length (Real size variation)
+          # 6. Dynamic MB Size Scaling based on code length
           CODE_LEN=$(wc -c < www/index.html)
           DYNAMIC_KB=$(( 2048 + (CODE_LEN * 25 / 100) ))
           if [ "$DYNAMIC_KB" -gt 30720 ]; then DYNAMIC_KB=30720; fi
           dd if=/dev/urandom of=www/ai_neural_core.bin bs=1024 count=$DYNAMIC_KB
 
-          # 6. WebView Hardware Acceleration Flags
+          # 7. WebView Hardware Acceleration Flags
           sed -i '/<\/widget>/i <preference name="android-hardwareAccelerated" value="true" />' config.xml
           sed -i '/<\/widget>/i <preference name="AllowInlineMediaPlayback" value="true" />' config.xml
           sed -i '/<\/widget>/i <access origin="*" />' config.xml
 
-          # 7. Compile Real APK via Gradle
+          # 8. Compile Real APK via Gradle
           cordova build android -- --gradleArg=--no-daemon
 
           RAW_NAME="${{ github.event.inputs.app_name }}"
@@ -116,11 +112,11 @@ jobs:
           SOURCE_APK=$(find platforms/android -name "*.apk" | head -n 1)
           mv "$SOURCE_APK" "final_apk/${CLEAN_NAME}.apk"
 
-       - name: Publish Direct Public Release
-         uses: softprops/action-gh-release@v2
-         with:
+      - name: Publish Direct Public Release
+        uses: softprops/action-gh-release@v2
+        with:
           tag_name: build-${{ github.run_number }}-${{ github.run_id }}
           name: "Release ${{ github.event.inputs.app_name }}"
           files: myApp/final_apk/*.apk
-         env:
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
