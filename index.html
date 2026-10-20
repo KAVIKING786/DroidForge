@@ -549,17 +549,17 @@
               if (relList && relList.length > 0) {
                 let targetApk = null;
 
-                for (const rel of relList) {
-                  const asset = rel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
-                  if (asset) {
-                    const isNewId = (previousReleaseId && rel.id !== previousReleaseId);
-                    const isNameMatch = asset.name.toLowerCase().includes(cleanTargetName.toLowerCase());
-                    if (isNewId || isNameMatch || sec >= 30) {
-                      targetApk = asset;
-                      break;
-                    }
-                  }
-                }
+          for (const rel of relList) {
+          const asset = rel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
+          if (asset) {
+            const isNewId = (previousReleaseId && rel.id !== previousReleaseId);
+            const isExactName = (asset.name.toLowerCase() === `${cleanTargetName.toLowerCase()}.apk`);
+            if (isNewId || isExactName) {
+              targetApk = asset;
+              break;
+            }
+          }
+        }
 
                 if (targetApk) {
                   clearInterval(timer);
