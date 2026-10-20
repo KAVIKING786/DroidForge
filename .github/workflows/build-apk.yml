@@ -60,8 +60,9 @@ jobs:
           cd myApp
           cordova platform add android@13.0.0
 
-          mkdir -p www
-          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/user_code.html
+          # Force overwrite Cordova default www with user HTML code directly
+          rm -rf www/*
+          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html
 
           # 4. Inject Pre-built AI & Hardware Bridge + User Code
           cat << 'EOF' > www/index.html
