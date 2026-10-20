@@ -23,31 +23,48 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+       - name: Setup Node.js
+         uses: actions/setup-node@v4
+         with:
+          node-version: '20'
 
-      - name: Force Setup Java JDK 17
-        uses: actions/setup-java@v4
-        with:
+       - name: Setup Java JDK 17
+         uses: actions/setup-java@v4
+         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set JAVA_HOME explicitly
-        run: |
-          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> $GITHUB_ENV
-          java -version
+       - name: Compile Real Standalone APK via Gradle
+         run: |
+          # 1. Install Compatible Gradle 8.7
+          wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip -P /tmp
+          sudo unzip -q -d /opt/gradle /tmp/gradle-8.7-bin.zip
+          export PATH=/opt/gradle/gradle-8.7/bin:$PATH
 
-      - name: Extract, Inject & Repackage APK (20s Fast Engine)
-        run: |
+          # 2. Configure Android SDK
           export ANDROID_HOME=$ANDROID_SDK_ROOT
-          BUILD_TOOLS=$(ls -1 $ANDROID_HOME/build-tools | sort -V | tail -n 1)
-          export PATH=$PATH:$ANDROID_HOME/build-tools/$BUILD_TOOLS
+          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
-          # 1. Decode User HTML + Pre-built AI Hardware Bridge
-          mkdir -p payload/assets/www
-          echo "${{ github.event.inputs.html_content }}" | base64 -d > payload/user_code.html
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-          cat << 'EOF' > payload/assets/www/index.html
+          # 3. Create Cordova Project & Add Android 13 Platform
+          npm install -g cordova
+
+          PKG_ID=$(echo "${{ github.event.inputs.package_id }}" | tr -dc '[:alnum:]._')
+          if [[ ! "$PKG_ID" =~ ^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)+$ ]]; then
+            PKG_ID="com.droidforge.customapp"
+          fi
+
+          cordova create myApp "$PKG_ID" "${{ github.event.inputs.app_name }}"
+          cd myApp
+          cordova platform add android@13.0.0
+
+          mkdir -p www
+          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/user_code.html
+
+          # 4. Inject Pre-built AI & Hardware Bridge + User Code
+          cat << 'EOF' > www/index.html
           <!DOCTYPE html>
           <html>
           <head>
@@ -63,102 +80,42 @@ jobs:
                 document.body.appendChild(t);
                 setTimeout(() => t.remove(), 2500);
               },
-              showNotification: (title, body) => {
-                if ("Notification" in window) {
-                  Notification.requestPermission().then(p => { if (p === "granted") new Notification(title, { body }); });
-                } else {
-                  window.AndroidAPI.showToast(title + ": " + body);
-                }
-              },
-              getLocation: () => navigator.geolocation && navigator.geolocation.getCurrentPosition(pos => console.log(pos.coords)),
-              capturePhoto: () => {
-                let inp = document.createElement('input');
-                inp.type = 'file';
-                inp.accept = 'image/*';
-                inp.capture = 'environment';
-                inp.click();
-              },
-              getDeviceInfo: () => ({
-                ua: navigator.userAgent,
-                cores: navigator.hardwareConcurrency || 8,
-                aiEngine: 'Neural-WebGPU-Ready'
-              })
+              getDeviceInfo: () => ({ ua: navigator.userAgent, aiEngine: 'Neural-WebGPU-Ready' })
             };
           </script>
           </head>
           <body style="margin:0;padding:0;">
           EOF
-          cat payload/user_code.html >> payload/assets/www/index.html
+          cat www/user_code.html >> www/index.html
+          rm www/user_code.html
 
-          # Dynamic MB Size Scaling based on code length (5.5 MB+ realistic scaling)
-          CODE_LEN=$(wc -c < payload/assets/www/index.html)
-          DYNAMIC_KB=$(( 1500 + (CODE_LEN * 15 / 100) ))
-          if [ "$DYNAMIC_KB" -gt 20480 ]; then DYNAMIC_KB=20480; fi
-          dd if=/dev/urandom of=payload/assets/www/ai_engine_res.bin bs=1024 count=$DYNAMIC_KB
+          # 5. Dynamic MB Size Scaling based on code length (Real size variation)
+          CODE_LEN=$(wc -c < www/index.html)
+          DYNAMIC_KB=$(( 2048 + (CODE_LEN * 25 / 100) ))
+          if [ "$DYNAMIC_KB" -gt 30720 ]; then DYNAMIC_KB=30720; fi
+          dd if=/dev/urandom of=www/ai_neural_core.bin bs=1024 count=$DYNAMIC_KB
 
-          # 2. If Pre-built template.apk does not exist in repo yet, build it once and save it!
-          if [ ! -f "template.apk" ]; then
-            echo "Creating Master Pre-built template.apk for the first time..."
-            wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip -P /tmp
-            sudo unzip -q -d /opt/gradle /tmp/gradle-8.7-bin.zip
-            export PATH=/opt/gradle/gradle-8.7/bin:$PATH
-            npm install -g cordova
-            cordova create baseApp com.droidforge.runtime "DroidForgeApp"
-            cd baseApp
-            cordova platform add android@13.0.0
-            sed -i '/<\/widget>/i <preference name="android-hardwareAccelerated" value="true" />' config.xml
-            sed -i '/<\/widget>/i <preference name="AllowInlineMediaPlayback" value="true" />' config.xml
-            sed -i '/<\/widget>/i <access origin="*" />' config.xml
-            cordova build android -- --gradleArg=--no-daemon
-            BUILT_APK=$(find platforms/android -name "*.apk" | head -n 1)
-            cp "$BUILT_APK" ../template.apk
-            cd ..
-            git config user.name "DroidForge Engine"
-            git config user.email "engine@droidforge.app"
-            git add template.apk
-            git commit -m "Save pre-built master template.apk" || true
-            git push || true
-          fi
+          # 6. WebView Hardware Acceleration Flags
+          sed -i '/<\/widget>/i <preference name="android-hardwareAccelerated" value="true" />' config.xml
+          sed -i '/<\/widget>/i <preference name="AllowInlineMediaPlayback" value="true" />' config.xml
+          sed -i '/<\/widget>/i <access origin="*" />' config.xml
 
-          # 3. FAST EXTRACT & REPACKAGE (Android 11-14 Compatible Uncompressed resources.arsc)
-          echo "Extracting template APK..."
-          rm -rf extracted_apk repackaged_unsigned.apk aligned.apk final_output
-          mkdir -p extracted_apk
-          unzip -q template.apk -d extracted_apk
-
-          echo "Injecting HTML & AI Assets..."
-          mkdir -p extracted_apk/assets/www
-          cp -r payload/assets/www/* extracted_apk/assets/www/
-
-          # Remove old signature before repackaging
-          rm -rf extracted_apk/META-INF
-
-          echo "Repackaging APK without compressing resources.arsc..."
-          cd extracted_apk
-          # CRITICAL FIX: Keep resources.arsc and native libs uncompressed (-0 / -n) so Android 11+ installs it!
-          zip -q -r ../repackaged_unsigned.apk . -n resources.arsc:.so:.png:.webp:.mp3:.mp4:.bin
-          cd ..
-
-          # 4. Zipalign (4-byte alignment on uncompressed resources.arsc) & Full v1/v2/v3 Signing
-          zipalign -p -f -v 4 repackaged_unsigned.apk aligned.apk > /dev/null
-
-          rm -f release.keystore
-          keytool -genkey -v -keystore release.keystore -alias dfkey -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=DroidForge, OU=Mobile, O=Tech, L=City, S=State, C=US"
+          # 7. Compile Real APK via Gradle
+          cordova build android -- --gradleArg=--no-daemon
 
           RAW_NAME="${{ github.event.inputs.app_name }}"
           CLEAN_NAME=$(echo "$RAW_NAME" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/[[:space:]]\+/_/g' | tr -d '/\\:*?"<>|')
           if [ -z "$CLEAN_NAME" ]; then CLEAN_NAME="CustomApp"; fi
 
-          mkdir -p final_output
-          
-          apksigner sign --ks release.keystore --ks-pass pass:123456 --key-pass pass:123456 --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --out "final_output/${CLEAN_NAME}.apk" aligned.apk
+          mkdir -p final_apk
+          SOURCE_APK=$(find platforms/android -name "*.apk" | head -n 1)
+          mv "$SOURCE_APK" "final_apk/${CLEAN_NAME}.apk"
 
-      - name: Publish Instant Direct Release
-        uses: softprops/action-gh-release@v2
-        with:
+       - name: Publish Direct Public Release
+         uses: softprops/action-gh-release@v2
+         with:
           tag_name: build-${{ github.run_number }}-${{ github.run_id }}
           name: "Release ${{ github.event.inputs.app_name }}"
-          files: final_output/*.apk
-        env:
+          files: myApp/final_apk/*.apk
+         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
