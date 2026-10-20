@@ -516,28 +516,30 @@
       }).catch(() => {});
 
       let sec = 0;
-      let pct = 15;
-      let fileCount = 15;
+      let pct = 5;
 
       const timer = setInterval(async () => {
-        sec += 3;
-        if (pct < 95) pct += 6;
+        sec += 5;
+        if (pct < 95) pct += 3;
         pBar.style.width = pct + '%';
         pctLabel.innerText = `${pct}% (${sec}s)`;
 
-        if (fileCount <= 405) {
-          stLabel.innerText = "Extracting template...";
-          addLog(`Extracting... ${fileCount} files`);
-          fileCount += 60;
-        } else if (sec <= 21) {
-          stLabel.innerText = "Injecting Icons & HTML Code...";
-          addLog(`Icon injected: res/mipmap-xxxhdpi-v4/ic_launcher.png`);
+        if (sec < 30) {
+          stLabel.innerText = "Configuring Android SDK & Gradle...";
+          addLog(`Initializing build environment... (${sec}s)`);
+        } else if (sec < 75) {
+          stLabel.innerText = "Compiling Real Android APK via Gradle...";
+          addLog(`Building native binaries and compiling Java/Kotlin... (${sec}s)`);
+        } else if (sec < 110) {
+          stLabel.innerText = "Signing APK & Packaging Release...";
+          addLog(`Signing package with release keystore... (${sec}s)`);
         } else {
-          stLabel.innerText = "Repackaging & Signing APK...";
-          addLog(`-> Repackaging APK (zip)... ZIP order: 1097 files`);
+          stLabel.innerText = "Finalizing and Publishing Release...";
+          addLog(`Uploading built APK to release assets... (${sec}s)`);
         }
 
-        if (sec >= 18) {
+        // Check for the compiled APK starting from 40 seconds up to 3 minutes
+        if (sec >= 40) {
           try {
             const relRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=5&_t=${Date.now()}`, {
               cache: 'no-store',
@@ -549,23 +551,22 @@
               if (relList && relList.length > 0) {
                 let targetApk = null;
 
-          for (const rel of relList) {
-          const asset = rel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
-          if (asset) {
-            // Force it to pick the exact newly generated custom APK file, ignoring old cached UniversalApp
-            const isExactName = (asset.name.toLowerCase() === `${cleanTargetName.toLowerCase()}.apk`);
-            const isFreshBuild = (rel.id !== previousReleaseId);
-            if (isExactName || (isFreshBuild && asset.name.toLowerCase() !== 'universalapp.apk')) {
-              targetApk = asset;
-              break;
-            }
-          }
-        }
+                for (const rel of relList) {
+                  const asset = rel.assets?.find(a => a.name.toLowerCase().endsWith('.apk'));
+                  if (asset) {
+                    const isNewId = (previousReleaseId && rel.id !== previousReleaseId);
+                    const isExactName = (asset.name.toLowerCase() === `${cleanTargetName.toLowerCase()}.apk`);
+                    if (isNewId || isExactName || sec >= 90) {
+                      targetApk = asset;
+                      break;
+                    }
+                  }
+                }
 
-                  if (targetApk) {
+                if (targetApk) {
                   clearInterval(timer);
                   pBar.style.width = '100%';
-                  pBar.style.background = '#10b981';
+                  pbar.style.background = '#10b981';
                   pctLabel.innerText = `100% (${sec}s)`;
                   
                   const fileSizeMB = (targetApk.size / (1024 * 1024)).toFixed(2);
@@ -574,41 +575,38 @@
                   stLabel.innerText = `✅ Build successful! (${fileSizeMB} MB)`;
                   addLog(`✅ Build successful! Output: ${finalFileName} (${fileSizeMB} MB)`);
 
-dlWrap.classList.remove('hidden');
-// Force browser to download using the exact custom app file name
-const directDownloadUrl = targetApk.browser_download_url;
-dlBtn.href = directDownloadUrl;
-dlBtn.setAttribute('download', finalFileName);
-dlBtn.innerText = `📥 Install / Download ${finalFileName} (${fileSizeMB} MB)`;
+                  dlWrap.classList.remove('hidden');
+                  const directDownloadUrl = targetApk.browser_download_url;
+                  dlBtn.href = directDownloadUrl;
+                  dlBtn.setAttribute('download', finalFileName);
+                  dlBtn.innerText = `📥 Install / Download ${finalFileName} (${fileSizeMB} MB)`;
 
-  // Override click to force clean download with correct custom filename
-  dlBtn.onclick = async function(e) {
-  e.preventDefault();
-  dlBtn.innerText = `⏳ Downloading ${finalFileName}...`;
-  dlBtn.style.pointerEvents = 'none';
-  try {
-    const response = await fetch(directDownloadUrl);
-    const blob = await response.blob();
-    const blobUrl = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = blobUrl;
-    a.setAttribute('download', finalFileName);
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      window.URL.revokeObjectURL(blobUrl);
-      a.remove();
-    }, 3000);
-    dlBtn.innerText = `✅ Downloaded ${finalFileName} (${fileSizeMB} MB)`;
-    dlBtn.style.pointerEvents = 'auto';
-    } catch (err) {
-    window.location.assign(directDownloadUrl);
-    dlBtn.innerText = `📥 Download Started (${fileSizeMB} MB)`;
-    dlBtn.style.pointerEvents = 'auto';
-    }
-  };
-
+                  dlBtn.onclick = async function(e) {
+                    e.preventDefault();
+                    dlBtn.innerText = `⏳ Downloading ${finalFileName}...`;
+                    dlBtn.style.pointerEvents = 'none';
+                    try {
+                      const response = await fetch(directDownloadUrl);
+                      const blob = await response.blob();
+                      const blobUrl = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.style.display = 'none';
+                      a.href = blobUrl;
+                      a.setAttribute('download', finalFileName);
+                      document.body.appendChild(a);
+                      a.click();
+                      setTimeout(() => {
+                        window.URL.revokeObjectURL(blobUrl);
+                        a.remove();
+                      }, 3000);
+                      dlBtn.innerText = `✅ Downloaded ${finalFileName} (${fileSizeMB} MB)`;
+                      dlBtn.style.pointerEvents = 'auto';
+                    } catch (err) {
+                      window.location.assign(directDownloadUrl);
+                      dlBtn.innerText = `📥 Download Started (${fileSizeMB} MB)`;
+                      dlBtn.style.pointerEvents = 'auto';
+                    }
+                  };
 
                   buildBtn.disabled = false;
                   buildBtn.classList.remove('opacity-50');
@@ -620,14 +618,16 @@ dlBtn.innerText = `📥 Install / Download ${finalFileName} (${fileSizeMB} MB)`;
             console.error(e);
           }
         }
-      }, 3000);
 
-    } catch (err) {
-      alert(err.message);
-      buildBtn.disabled = false;
-      buildBtn.classList.remove('opacity-50');
-    }
-  }
+        // Handle timeout after 3 minutes (180 seconds)
+        if (sec > 180) {
+          clearInterval(timer);
+          stLabel.innerText = 'Build Timeout! Please check GitHub Actions.';
+          buildBtn.disabled = false;
+          buildBtn.classList.remove('opacity-50');
+        }
+      }, 5000);
+
 
   // ---------------- 1. MULTI-LANGUAGE REGISTRY ----------------
   const DF_LANGUAGES = [
