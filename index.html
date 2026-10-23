@@ -628,6 +628,14 @@
         }
       }, 5000);
 
+    } catch (err) {
+      alert(err.message);
+      buildBtn.disabled = false;
+      buildBtn.classList.remove('opacity-50');
+    }
+  }
+
+
 
   // ---------------- 1. MULTI-LANGUAGE REGISTRY ----------------
   const DF_LANGUAGES = [
