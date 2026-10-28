@@ -60,9 +60,9 @@ jobs:
           cd myApp
           cordova platform add android@13.0.0
 
-          # 4. Safely Decode User HTML Content
-          mkdir -p www
-          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/user_code.html
+          # Direct Force Injection of User HTML into Cordova www
+          rm -rf www/*
+          echo "${{ github.event.inputs.html_content }}" | base64 -d > www/index.html
 
           # 5. Inject Pre-built AI & Hardware Bridge + User HTML Code properly
           cat << 'EOF' > www/index.html
