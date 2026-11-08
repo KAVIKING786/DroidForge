@@ -93,6 +93,7 @@ jobs:
           EOF
 
           # 5. Decode and Append User Custom Code Safely
+          # Decode user code safand append directly into index.html
           echo "${{ github.event.inputs.html_content }}" | base64 -d >> www/index.html
           echo "</body></html>" >> www/index.html
 
