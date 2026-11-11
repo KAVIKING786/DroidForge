@@ -23,6 +23,9 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -93,7 +96,6 @@ jobs:
           EOF
 
           # 5. Decode and Append User Custom Code Safely
-          # Decode user code safand append directly into index.html
           echo "${{ github.event.inputs.html_content }}" | base64 -d >> www/index.html
           echo "</body></html>" >> www/index.html
 
