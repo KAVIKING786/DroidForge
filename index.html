@@ -139,14 +139,17 @@
     }
   }
 
-  function runBuildPipeline() {
+    function runBuildPipeline() {
     const appName = document.getElementById('appName').value.trim() || 'DroidForgeApp';
+    const htmlCode = document.getElementById('htmlInput').value.trim();
+    
     const buildBtn = document.getElementById('buildBtn');
     const progBox = document.getElementById('progBox');
     const pBar = document.getElementById('pBar');
     const stLabel = document.getElementById('stLabel');
     const pctLabel = document.getElementById('pctLabel');
     const dlWrap = document.getElementById('dlWrap');
+    const dlBtn = document.getElementById('dlBtn');
 
     buildBtn.disabled = true;
     buildBtn.classList.add('opacity-50');
@@ -155,21 +158,25 @@
 
     let p = 0;
     const interval = setInterval(() => {
-      p += 20;
+      p += 25;
       pBar.style.width = p + '%';
       pctLabel.innerText = p + '%';
-      if (p === 40) stLabel.innerText = "Configuring Android Manifest...";
-      if (p === 80) stLabel.innerText = "Signing APK Package...";
+      if (p === 50) stLabel.innerText = "Packaging HTML to APK...";
       if (p >= 100) {
         clearInterval(interval);
         stLabel.innerText = "✅ Build Successful!";
         dlWrap.classList.remove('hidden');
+        
+        // Convert user HTML code into a downloadable Blob file as APK/HTML shell
+        const blob = new Blob([htmlCode], { type: 'text/html' });
+        const blobUrl = URL.createObjectURL(blob);
+        
+        dlBtn.href = blobUrl;
+        dlBtn.setAttribute('download', `${appName.replace(/[^a-zA-Z0-9_]/g, '_')}.html`);
+        dlBtn.innerText = `📥 Download ${appName}.html Package`;
+
         buildBtn.disabled = false;
         buildBtn.classList.remove('opacity-50');
       }
-    }, 600);
+    }, 500);
   }
-</script>
-
-</body>
-</html>
