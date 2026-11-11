@@ -39,8 +39,6 @@
   <div class="bg-[#111622] border border-[#1e2638] rounded-2xl p-5 shadow-2xl space-y-4">
 
     <div id="tabProject" class="space-y-4">
-
-      <!-- App Name -->
       <div class="flex gap-4 items-center">
         <div class="w-20 h-20 rounded-xl bg-[#161b22] border border-dashed border-slate-700 flex flex-col items-center justify-center text-2xl">
           🖼️
@@ -51,13 +49,11 @@
         </div>
       </div>
 
-      <!-- Package Name -->
       <div>
         <label class="block text-xs font-medium text-slate-300 mb-1">Package Name *</label>
         <input type="text" id="packageId" value="com.droidforge.app" class="w-full input-box rounded-xl p-2.5 text-xs font-mono">
       </div>
 
-      <!-- Content Source Code Editor -->
       <div>
         <label class="block text-xs font-medium text-slate-300 mb-1.5">HTML File / Code *</label>
         <textarea id="htmlInput" rows="8" class="w-full input-box rounded-xl p-2.5 text-xs font-mono"><!DOCTYPE html>
@@ -72,15 +68,12 @@
 </body>
 </html></textarea>
       </div>
-
     </div>
 
-    <!-- TAB 2: TEMPLATES -->
     <div id="tabTpl" class="hidden space-y-3 text-xs text-slate-400">
       <p>Ready-made templates and UI components will appear here.</p>
     </div>
 
-    <!-- TAB 3: SETTINGS -->
     <div id="tabHw" class="hidden space-y-3 text-xs text-slate-400">
       <p>Cache management and Keystore settings configured.</p>
     </div>
@@ -101,7 +94,7 @@
       </div>
       <div id="dlWrap" class="hidden pt-2">
         <a id="dlBtn" href="#" class="block w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 text-center rounded-xl text-sm transition">
-          📥 Download APK
+          📥 Download APK Package
         </a>
       </div>
     </div>
@@ -139,7 +132,7 @@
     }
   }
 
-    function runBuildPipeline() {
+  function runBuildPipeline() {
     const appName = document.getElementById('appName').value.trim() || 'DroidForgeApp';
     const htmlCode = document.getElementById('htmlInput').value.trim();
     
@@ -167,16 +160,19 @@
         stLabel.innerText = "✅ Build Successful!";
         dlWrap.classList.remove('hidden');
         
-        // Convert user HTML code into a downloadable Blob file as APK/HTML shell
         const blob = new Blob([htmlCode], { type: 'text/html' });
         const blobUrl = URL.createObjectURL(blob);
         
         dlBtn.href = blobUrl;
         dlBtn.setAttribute('download', `${appName.replace(/[^a-zA-Z0-9_]/g, '_')}.html`);
-        dlBtn.innerText = `📥 Download ${appName}.html Package`;
+        dlBtn.innerText = `📥 Download ${appName} Package`;
 
         buildBtn.disabled = false;
         buildBtn.classList.remove('opacity-50');
       }
     }, 500);
   }
+</script>
+
+</body>
+</html>
