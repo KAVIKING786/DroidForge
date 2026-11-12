@@ -15,78 +15,308 @@
 <body class="p-4 md:p-8 min-h-screen flex justify-center">
 
 <div class="w-full max-w-xl">
-  <!-- TOP BANNER -->
+  <!-- TOP BANNER AD -->
   <div class="mb-4">
     <div class="bg-[#161b22] border border-dashed border-slate-700 rounded-xl p-2.5 text-center text-xs text-slate-400">
-      <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">PRO</span> DroidForge Cloud Engine Active
+      <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">AD</span> Sponsored: High Speed Cloud Engine
     </div>
   </div>
 
-  <!-- Navigation Tabs -->
-  <div class="flex items-center justify-center gap-1.5 p-1 bg-[#12161f] border border-slate-800 rounded-xl mb-6">
-    <button id="tabProjectBtn" onclick="switchTab('project')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 tab-active">
-      🛠️ Project Info
-    </button>
-    <button id="tabTplBtn" onclick="switchTab('tpl')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 text-slate-400">
-      📁 Templates
-    </button>
-    <button id="tabHwBtn" onclick="switchTab('hw')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 text-slate-400">
-      ⚙️ Settings
-    </button>
+  <div class="text-center mb-4">
+    <p class="text-xs text-slate-400">No Watermark • 100% Free Real APK Builder</p>
   </div>
 
-  <!-- Main Container -->
-  <div class="bg-[#111622] border border-[#1e2638] rounded-2xl p-5 shadow-2xl space-y-4">
+   <!-- Navigation Tabs (Centered & Equal Width) -->
+    <div class="flex items-center justify-center gap-1.5 p-1 bg-[#12161f] border border-slate-800 rounded-xl mb-6">
+      <button id="tabProjectBtn" onclick="switchTab('project')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 tab-active">
+        🛠️ Project Info
+      </button>
+      <button id="tabTplBtn" onclick="switchTab('tpl')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 text-slate-400">
+        📁 Templates
+      </button>
+      <button id="tabHwBtn" onclick="switchTab('hw')" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 text-slate-400">
+        ⚙️ Settings
+      </button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="bg-[#111622] border border-[#1e2638] rounded-2xl p-5 shadow-2xl space-y-4">
 
     <div id="tabProject" class="space-y-4">
+
+      <!-- Icon & App Name -->
       <div class="flex gap-4 items-center">
-        <div class="w-20 h-20 rounded-xl bg-[#161b22] border border-dashed border-slate-700 flex flex-col items-center justify-center text-2xl">
-          🖼️
-        </div>
+        <label class="w-20 h-20 rounded-xl bg-[#161b22] border border-dashed border-slate-700 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500">
+          <span class="text-2xl">🖼️</span>
+          <span class="text-[10px] text-slate-400 mt-1">Upload Icon</span>
+          <input type="file" id="appIcon" accept="image/*" class="hidden">
+        </label>
         <div class="flex-1">
           <label class="block text-xs font-medium text-slate-300 mb-1">App Name *</label>
           <input type="text" id="appName" value="DroidForge App" class="w-full input-box rounded-xl p-2.5 text-sm font-medium">
         </div>
       </div>
 
+      <!-- Build Target Output -->
+      <div>
+        <label class="block text-xs font-medium text-slate-300 mb-1.5">Build Target Output *</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" id="btnApk" onclick="setOutput('apk')" class="bg-[#0284c7] text-white text-xs font-semibold py-2.5 rounded-xl border border-sky-400">Standalone APK</button>
+          <button type="button" id="btnAab" onclick="setOutput('aab')" class="bg-[#161b22] text-slate-400 text-xs font-semibold py-2.5 rounded-xl border border-slate-800">Play Store Bundle (.AAB)</button>
+        </div>
+        <p class="text-[10px] text-slate-500 mt-1">Full APK binary with pre-compiled Android native shell.</p>
+      </div>
+
+      <!-- Package Name -->
       <div>
         <label class="block text-xs font-medium text-slate-300 mb-1">Package Name *</label>
         <input type="text" id="packageId" value="com.droidforge.app" class="w-full input-box rounded-xl p-2.5 text-xs font-mono">
+        <p class="text-[10px] text-slate-500 mt-0.5">Android Application ID (e.g. com.company.app)</p>
       </div>
 
+      <!-- Version Codes -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Version Code</label>
+          <input type="number" id="vCode" value="1" class="w-full input-box rounded-xl p-2 text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Version Name</label>
+          <input type="text" id="vName" value="1.0" class="w-full input-box rounded-xl p-2 text-xs">
+        </div>
+      </div>
+
+      <!-- SDK Levels -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Min SDK (Android 7.0+)</label>
+          <input type="number" id="minSdk" value="24" class="w-full input-box rounded-xl p-2 text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Target SDK (Android 14+)</label>
+          <input type="number" id="targetSdk" value="34" class="w-full input-box rounded-xl p-2 text-xs">
+        </div>
+      </div>
+
+      <!-- Content Source Selector -->
       <div>
-        <label class="block text-xs font-medium text-slate-300 mb-1.5">HTML File / Code *</label>
-        <textarea id="htmlInput" rows="8" class="w-full input-box rounded-xl p-2.5 text-xs font-mono"><!DOCTYPE html>
+        <label class="block text-xs font-medium text-slate-300 mb-1.5">Content Source *</label>
+        <div class="grid grid-cols-2 gap-2 mb-2">
+          <button type="button" id="btnSourceUrl" onclick="setSource('url')" class="bg-[#161b22] text-slate-400 text-xs font-medium py-2 rounded-xl border border-slate-800">Website URL</button>
+          <button type="button" id="btnSourceCode" onclick="setSource('code')" class="bg-[#0284c7] text-white text-xs font-medium py-2 rounded-xl border border-sky-400">HTML File / Code</button>
+        </div>
+
+        <input type="url" id="urlInput" value="https://google.com" class="w-full input-box rounded-xl p-2.5 text-xs hidden" placeholder="https://example.com">
+
+        <textarea id="htmlInput" rows="6" class="w-full input-box rounded-xl p-2.5 text-xs font-mono" placeholder="Paste your HTML / CSS / JS code here..."><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My App</title>
+  <title>App</title>
 </head>
 <body style="background:#111;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:sans-serif;">
   <h2>Your Application Ready!</h2>
 </body>
 </html></textarea>
       </div>
+
+      <!-- MULTI-ADMOB MONETIZATION -->
+      <details class="rounded-xl border border-slate-800 bg-[#161b22] p-3">
+        <summary class="text-xs font-semibold text-amber-400 cursor-pointer flex justify-between items-center">
+          <span>💰 Monetization / AdMob (Multi-Ads)</span>
+          <span class="text-slate-500 text-[10px]">▼</span>
+        </summary>
+        <div class="mt-3 space-y-2 pt-2 border-t border-slate-800 text-xs">
+          <div>
+            <label class="text-slate-400 block mb-0.5">AdMob App ID</label>
+            <input type="text" id="admobId" placeholder="ca-app-pub-xxxxxxxx~yyyyyyyy" class="w-full input-box rounded-lg p-2 text-xs font-mono">
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-0.5">1. Banner Ad Unit ID</label>
+            <input type="text" id="admobBanner" placeholder="ca-app-pub-xxxxxxxx/banner_id" class="w-full input-box rounded-lg p-2 text-xs font-mono">
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-0.5">2. Interstitial Ad Unit ID</label>
+            <input type="text" id="admobInter" placeholder="ca-app-pub-xxxxxxxx/inter_id" class="w-full input-box rounded-lg p-2 text-xs font-mono">
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-0.5">3. Rewarded Video Ad ID</label>
+            <input type="text" id="admobReward" placeholder="ca-app-pub-xxxxxxxx/reward_id" class="w-full input-box rounded-lg p-2 text-xs font-mono">
+          </div>
+        </div>
+      </details>
+
     </div>
 
-    <div id="tabTpl" class="hidden space-y-3 text-xs text-slate-400">
-      <p>Ready-made templates and UI components will appear here.</p>
+    <!-- TAB 2: TEMPLATES -->
+    <div id="tabTpl" class="hidden space-y-3">
+      <p class="text-xs text-slate-400 mb-2">Ready-made HTML projects that use native Android APIs.</p>
+
+      <div onclick="applyTemplate('interaction')" class="bg-gradient-to-r from-emerald-950/40 to-[#161b22] border border-emerald-800/40 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-emerald-500">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">📺</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Interaction</h4>
+            <p class="text-[10px] text-slate-400">Toast, vibration, flashlight and notification...</p>
+          </div>
+        </div>
+        <span class="text-slate-500">›</span>
+      </div>
+
+      <div onclick="applyTemplate('starters')" class="bg-[#161b22] border border-slate-800 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-slate-700">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center">✏️</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Starters</h4>
+            <p class="text-[10px] text-slate-400">Blank pages, full-screen layouts and sim...</p>
+          </div>
+        </div>
+        <span class="text-slate-500">›</span>
+      </div>
+
+      <div onclick="applyTemplate('libraries')" class="bg-gradient-to-r from-rose-950/30 to-[#161b22] border border-rose-800/40 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-rose-500">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center">💻</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Starter Libraries</h4>
+            <p class="text-[10px] text-slate-400">Ready-to-use HTML templates with pop...</p>
+          </div>
+        </div>
+        <span class="text-slate-500">›</span>
+      </div>
+
+      <div onclick="applyTemplate('earn')" class="bg-gradient-to-r from-emerald-950/40 to-[#161b22] border border-emerald-800/50 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-emerald-400">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">💲</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Earn Money</h4>
+            <p class="text-[10px] text-slate-400">Earn money with AdMob ads (Banner, Int...</p>
+          </div>
+        </div>
+        <span class="text-slate-500">›</span>
+      </div>
+
+      <div onclick="applyTemplate('device')" class="bg-[#161b22] border border-slate-800 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-slate-700">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">📍</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Device</h4>
+            <p class="text-[10px] text-slate-400">Camera, microphone, location, files, clip...</p>
+          </div>
+        </div>
+        <span class="text-amber-400">★</span>
+      </div>
+
+      <div onclick="applyTemplate('sensors')" class="bg-[#161b22] border border-slate-800 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-slate-700">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">🧭</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Sensors</h4>
+            <p class="text-[10px] text-slate-400">Accelerometer, gyroscope, magnetomet...</p>
+          </div>
+        </div>
+        <span class="text-amber-400">★</span>
+      </div>
+
+      <div onclick="applyTemplate('system')" class="bg-[#161b22] border border-slate-800 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-slate-700">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center">⚙️</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">System</h4>
+            <p class="text-[10px] text-slate-400">Battery, device info, permissions and bri...</p>
+          </div>
+        </div>
+        <span class="text-amber-400">★</span>
+      </div>
+
+      <div onclick="applyTemplate('dashboard')" class="bg-[#161b22] border border-slate-800 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-slate-700">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-yellow-500/20 text-yellow-400 flex items-center justify-center">🪟</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Dashboard</h4>
+            <p class="text-[10px] text-slate-400">Ready-to-use dashboards that combine ...</p>
+          </div>
+        </div>
+        <span class="text-amber-400">★</span>
+      </div>
+
+      <!-- TAB 2 AD BANNER -->
+      <div class="bg-[#161b22] border border-dashed border-slate-700 rounded-xl p-3 text-center text-xs text-slate-400">
+        <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">AD</span> Free SSL & Unlimited Cloud APK Hosting
+      </div>
     </div>
 
-    <div id="tabHw" class="hidden space-y-3 text-xs text-slate-400">
-      <p>Cache management and Keystore settings configured.</p>
+    <!-- TAB 3: SETTINGS -->
+    <div id="tabHw" class="hidden space-y-3">
+      <div class="bg-[#161b22] border border-slate-800 rounded-2xl divide-y divide-slate-800/80 overflow-hidden text-xs">
+        
+        <div onclick="openLanguageModal()" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
+          <div class="flex items-center gap-3">
+            <span class="text-sky-400 text-sm">🌐</span>
+            <div>
+              <div class="font-bold text-white">Language</div>
+              <div id="currentLangLabel" class="text-[10px] text-slate-400">System default (English)</div>
+            </div>
+          </div>
+          <span class="text-slate-500">›</span>
+        </div>
+
+        <div onclick="openThemeModal()" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
+          <div class="flex items-center gap-3">
+            <span class="text-indigo-400 text-sm">🎨</span>
+            <div>
+              <div class="font-bold text-white">Theme</div>
+              <div class="text-[10px] text-slate-400">System (Dark Mode)</div>
+            </div>
+          </div>
+          <span class="text-slate-500">›</span>
+        </div>
+
+        <div onclick="openKeystoreModal()" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
+          <div class="flex items-center gap-3">
+            <span class="text-cyan-400 text-sm">🔒</span>
+            <div>
+              <div class="font-bold text-white">Keystore Manager</div>
+              <div class="text-[10px] text-slate-400">Release Keystore (Auto Signed)</div>
+            </div>
+          </div>
+          <span class="text-slate-500">›</span>
+        </div>
+
+        <div onclick="clearAllAppCache()" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
+          <div class="flex items-center gap-3">
+            <span class="text-rose-400 text-sm">🗑️</span>
+            <div>
+              <div class="font-bold text-white">Clear Cache</div>
+              <div class="text-[10px] text-slate-400">Clean temporary build files (0.0 MB)</div>
+            </div>
+          </div>
+          <span class="text-slate-500">›</span>
+        </div>
+
+      </div>
+
+      <!-- TAB 3 AD BANNER -->
+      <div class="bg-[#161b22] border border-dashed border-slate-700 rounded-xl p-3 text-center text-xs text-slate-400">
+        <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">AD</span> Turbo Gradle Cloud Cache: Enabled
+      </div>
     </div>
 
     <!-- Main Action Button -->
-    <button id="buildBtn" type="button" onclick="runBuildPipeline()" class="w-full bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2">
+    <button id="buildBtn" onclick="runBuildPipeline()" class="w-full bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2">
       🚀 Build Real Clean Package (100% Free)
     </button>
 
     <!-- Progress Section -->
     <div id="progBox" class="hidden bg-[#161b22] border border-slate-800 rounded-xl p-4 space-y-2">
+      <div class="bg-amber-950/40 border border-amber-800/40 rounded-lg p-2.5 text-center text-xs text-amber-200">
+        <span class="text-[9px] bg-amber-500 text-black font-bold px-1.5 py-0.5 rounded mr-1">PROMOTION</span>
+        ⚡ Turbo Build Activated: APK generating without watermark!
+      </div>
+
       <div class="flex justify-between items-center text-xs">
-        <span id="stLabel" class="text-sky-400 font-medium">⚡ Processing Application...</span>
+        <span id="stLabel" class="text-sky-400 font-medium">⚡ Packaging Application...</span>
         <span id="pctLabel" class="font-mono text-slate-300">0%</span>
       </div>
       <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
@@ -94,15 +324,47 @@
       </div>
       <div id="dlWrap" class="hidden pt-2">
         <a id="dlBtn" href="#" class="block w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 text-center rounded-xl text-sm transition">
-          📥 Download APK Package
+          📥 Install / Download APK
         </a>
+      </div>
+    </div>
+
+    <!-- BOTTOM BANNER AD -->
+    <div class="pt-4">
+      <div class="bg-[#161b22] border border-dashed border-slate-700 rounded-xl p-2.5 text-center text-xs text-slate-400">
+        <span class="text-[10px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded mr-1">AD</span> Google Play Console Ready Apps - Fast Deployment
       </div>
     </div>
 
   </div>
 </div>
 
+<!-- ================= DROIDFORGE ENGINE MODALS & RUNTIME ================= -->
+<div id="dfModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div class="bg-[#12161f] border border-slate-700/80 rounded-2xl w-full max-w-md max-h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-[#161b26]">
+      <div class="flex items-center gap-2">
+        <button onclick="closeDfModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm">✕</button>
+        <h3 id="dfModalTitle" class="font-bold text-sm text-white">Title</h3>
+      </div>
+      <span id="dfModalBadge" class="text-[10px] px-2 py-0.5 rounded font-mono bg-sky-950 text-sky-400 border border-sky-800/40">100% FREE</span>
+    </div>
+    <div id="dfModalBody" class="p-4 overflow-y-auto space-y-3 text-xs flex-1"></div>
+    <div id="dfModalFooter" class="p-3 border-t border-slate-800/80 bg-[#161b26] hidden">
+      <button id="dfModalActionBtn" class="w-full py-2.5 rounded-xl font-bold text-xs bg-sky-500 hover:bg-sky-400 text-slate-950 transition-all shadow-lg shadow-sky-500/20">
+        Insert into Project
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
+  const PROXY_URL = "https://script.google.com/macros/s/AKfycbxcM3KLPmvZk6KjMf9zKfqtv1r5pYg69n3GfT6mf4Wg54IoxlAeCW7c2yuOU9TOWMAW5A/exec"; 
+  const REPO_OWNER = "KAVIKING786";
+  const REPO_NAME = "DroidForge";
+
+  let currentSource = 'code';
+
   function switchTab(tab) {
     document.getElementById('tabProject').classList.add('hidden');
     document.getElementById('tabHw').classList.add('hidden');
@@ -132,10 +394,52 @@
     }
   }
 
-  function runBuildPipeline() {
-    const appName = document.getElementById('appName').value.trim() || 'DroidForgeApp';
-    const htmlCode = document.getElementById('htmlInput').value.trim();
-    
+  function setOutput(type) {
+    const apk = document.getElementById('btnApk');
+    const aab = document.getElementById('btnAab');
+    if (type === 'apk') {
+      apk.className = "bg-[#0284c7] text-white text-xs font-semibold py-2.5 rounded-xl border border-sky-400";
+      aab.className = "bg-[#161b22] text-slate-400 text-xs font-semibold py-2.5 rounded-xl border border-slate-800";
+    } else {
+      aab.className = "bg-[#0284c7] text-white text-xs font-semibold py-2.5 rounded-xl border border-sky-400";
+      apk.className = "bg-[#161b22] text-slate-400 text-xs font-semibold py-2.5 rounded-xl border border-slate-800";
+    }
+  }
+
+  function setSource(src) {
+    currentSource = src;
+    const bUrl = document.getElementById('btnSourceUrl');
+    const bCode = document.getElementById('btnSourceCode');
+    const urlIn = document.getElementById('urlInput');
+    const htmlIn = document.getElementById('htmlInput');
+
+    if (src === 'url') {
+      bUrl.className = "bg-[#0284c7] text-white text-xs font-medium py-2 rounded-xl border border-sky-400";
+      bCode.className = "bg-[#161b22] text-slate-400 text-xs font-medium py-2 rounded-xl border border-slate-800";
+      urlIn.classList.remove('hidden');
+      htmlIn.classList.add('hidden');
+    } else {
+      bCode.className = "bg-[#0284c7] text-white text-xs font-medium py-2 rounded-xl border border-sky-400";
+      bUrl.className = "bg-[#161b22] text-slate-400 text-xs font-medium py-2 rounded-xl border border-slate-800";
+      htmlIn.classList.remove('hidden');
+      urlIn.classList.add('hidden');
+    }
+  }
+
+  async function runBuildPipeline() {
+    const appName = document.getElementById('appName').value.trim() || 'MyAwesomeApp';
+    const packageId = document.getElementById('packageId').value.trim() || 'com.droidforge.app';
+    let codeToPack = '';
+
+    if (currentSource === 'url') {
+      const u = document.getElementById('urlInput').value.trim();
+      codeToPack = `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body,iframe{margin:0;padding:0;width:100%;height:100%;border:none;overflow:hidden}</style></head><body><iframe src="${u}"></iframe></body></html>`;
+    } else {
+      codeToPack = document.getElementById('htmlInput').value.trim();
+    }
+
+    const encodedCode = btoa(unescape(encodeURIComponent(codeToPack)));
+
     const buildBtn = document.getElementById('buildBtn');
     const progBox = document.getElementById('progBox');
     const pBar = document.getElementById('pBar');
@@ -148,29 +452,345 @@
     buildBtn.classList.add('opacity-50');
     progBox.classList.remove('hidden');
     dlWrap.classList.add('hidden');
+    pBar.style.width = '15%';
+    pBar.style.background = '#0284c7';
 
-    let p = 0;
-    const interval = setInterval(() => {
-      p += 25;
-      pBar.style.width = p + '%';
-      pctLabel.innerText = p + '%';
-      if (p === 50) stLabel.innerText = "Packaging HTML to APK...";
-      if (p >= 100) {
-        clearInterval(interval);
-        stLabel.innerText = "✅ Build Successful!";
-        dlWrap.classList.remove('hidden');
-        
-        const blob = new Blob([htmlCode], { type: 'text/html' });
-        const blobUrl = URL.createObjectURL(blob);
-        
-        dlBtn.href = blobUrl;
-        dlBtn.setAttribute('download', `${appName.replace(/[^a-zA-Z0-9_]/g, '_')}.html`);
-        dlBtn.innerText = `📥 Download ${appName} Package`;
+    try {
+      await fetch(PROXY_URL, {
+        method: 'POST', 
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify({
+          ref: 'main',
+          inputs: {
+            app_name: appName,
+            package_id: packageId,
+            html_content: encodedCode
+          }
+        })
+      });
 
-        buildBtn.disabled = false;
-        buildBtn.classList.remove('opacity-50');
-      }
-    }, 500);
+      const triggerTime = Date.now();
+      let sec = 0;
+      let pct = 20;
+
+      const timer = setInterval(async () => {
+        sec += 5;
+        if (pct < 95) pct += Math.floor(Math.random() * 2) + 1;
+        pBar.style.width = pct + '%';
+        pctLabel.innerText = `${pct}% (${sec}s)`;
+        stLabel.innerText = "Processing Ultra-Fast APK Engine...";
+
+        // Start checking releases after 40 seconds
+        if (sec >= 40) {
+          try {
+            const relRes = await fetch(
+              `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=10&_=${Date.now()}`,
+              { cache: 'no-store' }
+            );
+
+            if (relRes.ok) {
+              const relList = await relRes.json();
+
+              if (Array.isArray(relList) && relList.length > 0) {
+                let foundApk = null;
+                let foundRel = null;
+
+                for (const rel of relList) {
+                  const apkAsset = (rel.assets || []).find(
+                    a => a.name.toLowerCase().endsWith('.apk')
+                  );
+                  if (apkAsset) {
+                    foundApk = apkAsset;
+                    foundRel = rel;
+                    break;
+                  }
+                }
+
+                if (foundApk) {
+                  const relTime = new Date(foundRel.created_at).getTime();
+                  const isNew = relTime >= (triggerTime - 120000);
+
+                  clearInterval(timer);
+                  pBar.style.width = '100%';
+                  pBar.style.background = '#10b981';
+                  pctLabel.innerText = '100%';
+
+                  if (isNew) {
+                    stLabel.innerText = 'Build Successful!';
+                  } else {
+                    stLabel.innerText = 'Latest available APK';
+                  }
+
+                  dlBtn.href = foundApk.browser_download_url;
+                  dlBtn.target = '_blank';
+                  dlBtn.rel = 'noopener';
+                  dlBtn.removeAttribute('download');
+                  dlBtn.innerText = `Download ${foundApk.name} (${(foundApk.size / (1024 * 1024)).toFixed(2)} MB)`;
+
+                  dlBtn.onclick = function () {
+                    window.location.href = foundApk.browser_download_url;
+                  };
+
+                  dlWrap.classList.remove('hidden');
+                  buildBtn.disabled = false;
+                  buildBtn.classList.remove('opacity-50');
+                  return;
+                }
+              }
+            }
+          } catch (e) {
+            console.error('Release check failed:', e);
+          }
+        }
+
+        // Timeout after 5 minutes
+        if (sec > 300) {
+          clearInterval(timer);
+          stLabel.innerText = 'Build Timeout! Please check GitHub Actions.';
+          buildBtn.disabled = false;
+          buildBtn.classList.remove('opacity-50');
+        }
+      }, 5000);
+
+
+    } catch (err) {
+      alert(err.message);
+      buildBtn.disabled = false;
+      buildBtn.classList.remove('opacity-50');
+    }
+  }
+
+  // ---------------- 1. MULTI-LANGUAGE REGISTRY ----------------
+  const DF_LANGUAGES = [
+    { code: 'sys', name: 'System default (English)' },
+    { code: 'en', name: 'English' },
+    { code: 'ta', name: 'தமிழ் (Tamil)' },
+    { code: 'hi', name: 'हिन्दी (Hindi)' },
+    { code: 'te', name: 'తెలుగు (Telugu)' },
+    { code: 'ml', name: 'മലയാളം (Malayalam)' },
+    { code: 'kn', name: 'ಕನ್ನಡ (Kannada)' },
+    { code: 'es', name: 'Español (Spanish)' },
+    { code: 'fr', name: 'Français (French)' },
+    { code: 'de', name: 'Deutsch (German)' }
+  ];
+
+  // ---------------- 2. THEMES REGISTRY ----------------
+   const DF_THEMES = [
+    { id: 'dark', name: 'Default Dark (GitHub Slate)', bg: '#0d1117', card: '#161b22', border: '#30363d', text: '#c9d1d9', accent: '#0284c7' },
+    { id: 'amoled', name: 'Pure AMOLED (Pitch Black)', bg: '#000000', card: '#0a0a0a', border: '#222222', text: '#f3f4f6', accent: '#38bdf8' },
+    { id: 'sky', name: 'Deep Ocean (Midnight Navy)', bg: '#051329', card: '#0a2244', border: '#1e3a8a', text: '#e0f2fe', accent: '#0284c7' },
+    { id: 'emerald', name: 'Emerald Forest (Hacker Green)', bg: '#031a14', card: '#062d22', border: '#065f46', text: '#d1fae5', accent: '#10b981' },
+    { id: 'purple', name: 'Cyberpunk Violet (Neon Night)', bg: '#130924', card: '#1f1038', border: '#5b21b6', text: '#f3e8ff', accent: '#8b5cf6' },
+    { id: 'amber', name: 'Warm Amber (Sunset Gold)', bg: '#1c1003', card: '#2b1904', border: '#78350f', text: '#fef3c7', accent: '#f59e0b' },
+    { id: 'rose', name: 'Velvet Rose (Crimson Dark)', bg: '#1a050d', card: '#2e0a19', border: '#831843', text: '#ffe4e6', accent: '#f43f5e' }
+  ];
+
+  // ---------------- 3. SUB-APIS DEFINITIONS ----------------
+  const DF_API_DATABASE = {
+    interaction: {
+      title: "Interaction APIs",
+      items: [
+        { name: "Vibrate", desc: "Control device vibration motor.", code: "AndroidAPI.vibrate(500);" },
+        { name: "Torch / Flashlight", desc: "Toggle camera flashlight on/off.", code: "AndroidAPI.setTorch(true);" },
+        { name: "Notification", desc: "Send immediate native Android notification.", code: "AndroidAPI.showNotification('Title', 'Message body');" },
+        { name: "Toast Message", desc: "Show brief Android toast message.", code: "AndroidAPI.showToast('Hello from DroidForge!');" }
+      ]
+    },
+    starters: {
+      title: "Starters Layouts",
+      items: [
+        { name: "Blank Page", desc: "A clean empty canvas to design your UI.", code: "<!DOCTYPE html>\n<html>\n<head><meta name='viewport' content='width=device-width, initial-scale=1.0'></head>\n<body style='background:#111;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;'>\n  <h2>Ready App Shell</h2>\n</body>\n</html>" }
+      ]
+    },
+    libraries: {
+      title: "Starter Libraries",
+      items: [
+        { name: "Tailwind CSS", desc: "Pre-configured modern utility framework.", code: "<script src='https://cdn.tailwindcss.com'><\/script>\n<div class='p-6 bg-slate-900 text-white min-h-screen'>Tailwind Ready</div>" }
+      ]
+    },
+    earn: {
+      title: "Earn Money (AdMob)",
+      items: [
+        { name: "Banner Ad", desc: "Place responsive banner ad strip.", code: "AndroidAPI.showBannerAd();" },
+        { name: "Interstitial Ad", desc: "Show full-screen interstitial ad.", code: "AndroidAPI.showInterstitialAd();" }
+      ]
+    },
+    device: {
+      title: "Native Device APIs",
+      items: [
+        { name: "GPS Location", desc: "Acquire real-time GPS coordinates.", code: "AndroidAPI.getLocation('loc1');" },
+        { name: "Camera Photo", desc: "Capture photo via hardware camera.", code: "AndroidAPI.capturePhoto('cam1');" }
+      ]
+    },
+    sensors: {
+      title: "Hardware Sensors",
+      items: [
+        { name: "Accelerometer", desc: "Read 3-axis motion (X, Y, Z).", code: "AndroidAPI.startSensor('accelerometer', 'acc1');" }
+      ]
+    },
+    system: {
+      title: "System APIs",
+      items: [
+        { name: "Device Info", desc: "Read device model, SDK level, brand.", code: "var info = AndroidAPI.getDeviceInfo();\nconsole.log(info);" }
+      ]
+    },
+    dashboard: {
+      title: "All-in-One Dashboard",
+      items: [
+        { name: "Master Full Android API Shell", desc: "All native hardware, ads, and sensors integrated.", code: "AndroidAPI.showToast('Master Initialized');" }
+      ]
+    }
+  };
+
+  // ---------------- 4. MODAL CONTROLLERS ----------------
+  function openDfModal(title, contentHtml, showAction = false, actionCode = "") {
+    document.getElementById('dfModalTitle').innerText = title;
+    document.getElementById('dfModalBody').innerHTML = contentHtml;
+    const footer = document.getElementById('dfModalFooter');
+    const actionBtn = document.getElementById('dfModalActionBtn');
+    if (showAction) {
+      footer.classList.remove('hidden');
+      actionBtn.onclick = function() {
+        injectCodeToProject(actionCode);
+        closeDfModal();
+      };
+    } else {
+      footer.classList.add('hidden');
+    }
+    document.getElementById('dfModal').classList.remove('hidden');
+  }
+
+  function closeDfModal() {
+    document.getElementById('dfModal').classList.add('hidden');
+  }
+
+  // ---------------- 5. TEMPLATES & API CLICK HANDLER ----------------
+  function applyTemplate(category) {
+    const data = DF_API_DATABASE[category];
+    if (!data) return;
+
+    let html = `<div class="space-y-2.5">`;
+    data.items.forEach((item, idx) => {
+      html += `
+        <div onclick="showApiDetail('${category}', ${idx})" class="p-3 bg-[#181f2c] border border-slate-800 rounded-xl hover:border-sky-500/50 cursor-pointer flex justify-between items-center group">
+          <div>
+            <div class="font-bold text-white group-hover:text-sky-400">${item.name}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">${item.desc}</div>
+          </div>
+          <span class="text-slate-500 group-hover:text-sky-400 font-bold">›</span>
+        </div>`;
+    });
+    html += `</div>`;
+    openDfModal(data.title, html, false);
+  }
+
+  function showApiDetail(category, index) {
+    const item = DF_API_DATABASE[category].items[index];
+    const encodedCode = encodeURIComponent(item.code);
+    let html = `
+      <div class="space-y-3">
+        <p class="text-slate-300 leading-relaxed">${item.desc}</p>
+        <div>
+          <div class="flex justify-between items-center mb-1 text-[11px] font-semibold text-sky-400">
+            <span>How to call this API</span>
+            <button onclick="navigator.clipboard.writeText(decodeURIComponent('${encodedCode}')); alert('Code copied!');" class="text-slate-400 hover:text-white text-[10px] bg-slate-800 px-2 py-0.5 rounded">Copy</button>
+          </div>
+          <pre class="bg-black/60 p-3 rounded-xl border border-slate-800 text-[11px] text-sky-300 font-mono overflow-x-auto whitespace-pre-wrap">${item.code}</pre>
+        </div>
+      </div>`;
+    openDfModal(item.name, html, true, item.code);
+  }
+
+  function injectCodeToProject(code) {
+    switchTab('project');
+    setSource('code');
+    const editor = document.getElementById('htmlInput');
+    if (editor) {
+      editor.value = code;
+    }
+  }
+
+  // ---------------- 6. SETTINGS MODALS ----------------
+  function openLanguageModal() {
+    let html = `<div class="divide-y divide-slate-800/80 max-h-[60vh] overflow-y-auto">`;
+    DF_LANGUAGES.forEach(lang => {
+      html += `
+        <div onclick="setAppLanguage('${lang.code}', '${lang.name}')" class="p-3 flex items-center justify-between cursor-pointer hover:bg-slate-800/40">
+          <span class="text-slate-200">${lang.name}</span>
+          <span class="text-sky-400 text-xs">✓</span>
+        </div>`;
+    });
+    html += `</div>`;
+    openDfModal("Select Language", html, false);
+  }
+
+  function setAppLanguage(code, name) {
+    const label = document.getElementById('currentLangLabel');
+    if (label) label.innerText = name;
+    closeDfModal();
+  }
+
+  function openThemeModal() {
+    let html = `<div class="divide-y divide-slate-800/80">`;
+    DF_THEMES.forEach(t => {
+      html += `
+        <div onclick="applyTheme('${t.id}')" class="p-3 flex items-center justify-between cursor-pointer hover:bg-slate-800/40">
+          <div class="flex items-center justify-between cursor-pointer hover:bg-slate-800/40">
+            <span class="w-4 h-4 rounded-full border border-white/20" style="background:${t.bg}"></span>
+            <span class="text-slate-200">${t.name}</span>
+          </div>
+          <span class="text-sky-400 text-xs">✓</span>
+        </div>`;
+    });
+    html += `</div>`;
+    openDfModal("Select Theme", html, false);
+  }
+
+    function applyTheme(themeId) {
+    const selected = DF_THEMES.find(t => t.id === themeId);
+    if (!selected) return;
+
+    document.body.style.backgroundColor = selected.bg;
+    document.body.style.color = selected.text;
+
+    document.querySelectorAll('.bg-\\[\\#161b22\\], .bg-\\[\\#111622\\], .bg-\\[\\#12161f\\]').forEach(el => {
+      el.style.backgroundColor = selected.card;
+      el.style.borderColor = selected.border;
+    });
+
+    document.querySelectorAll('.input-box').forEach(el => {
+      el.style.backgroundColor = selected.bg;
+      el.style.borderColor = selected.border;
+    });
+
+    closeDfModal();
+  }
+
+  function openKeystoreModal() {
+    let html = `
+      <div class="space-y-3">
+        <div class="p-3 bg-black/40 border border-slate-800 rounded-xl space-y-2">
+          <div><span class="text-slate-400 text-[10px]">Active Alias:</span> <div class="font-mono text-white">droidforge_release_key</div></div>
+          <div><span class="text-slate-400 text-[10px]">Algorithm:</span> <div class="font-mono text-white">RSA 2048-bit (SHA256withRSA)</div></div>
+          <div><span class="text-slate-400 text-[10px]">Validity:</span> <div class="font-mono text-white">25 Years (Google Play Store Ready)</div></div>
+        </div>
+      </div>`;
+    openDfModal("Keystore Manager", html, false);
+  }
+
+  function clearAllAppCache() {
+    if (confirm("Are you sure you want to clear build cache and reset all inputs?")) {
+      document.getElementById('appName').value = 'DroidForge App';
+      document.getElementById('packageId').value = 'com.droidforge.app';
+      document.getElementById('appIcon').value = '';
+      document.getElementById('htmlInput').value = '<!DOCTYPE html>\n<html>\n<body>\n<h2>Your Application Ready!</h2>\n</body>\n</html>';
+      localStorage.clear();
+      sessionStorage.clear();
+      alert("Cache cleared successfully!");
+    }
   }
 </script>
 
