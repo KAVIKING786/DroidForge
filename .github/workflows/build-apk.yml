@@ -4,128 +4,110 @@ on:
   workflow_dispatch:
     inputs:
       app_name:
-        description: 'App Name'
+        description: "App Name"
         required: true
-        default: 'DroidForgeApp'
+        default: "UniversalApp"
       package_id:
-        description: 'Package ID'
+        description: "Package ID"
         required: true
-        default: 'com.droidforge.app'
-      html_content:
-        description: 'Custom HTML/JS Code'
-        required: true
-        default: ''
+        default: "com.universal.app"
 
 jobs:
   build-apk:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
 
-      - name: Setup Java JDK 17
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: 17
 
-      - name: Compile Real Standalone APK via Gradle
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Cordova
+        run: npm install -g cordova
+
+      - name: Validate package ID
         run: |
-          # 1. Install Compatible Gradle 8.7
-          wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip -P /tmp
-          sudo unzip -q -d /opt/gradle /tmp/gradle-8.7-bin.zip
-          export PATH=/opt/gradle/gradle-8.7/bin:$PATH
-
-          # 2. Configure Android SDK
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
-
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-
-          # 3. Create Cordova Project & Add Android 13 Platform
-          npm install -g cordova
-
-          PKG_ID=$(echo "${{ github.event.inputs.package_id }}" | tr -dc '[:alnum:]._')
-          if [[ ! "$PKG_ID" =~ ^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)+$ ]]; then
-            PKG_ID="com.droidforge.customapp"
+          PACKAGE_ID="${{ github.event.inputs.package_id }}"
+          if [[ ! "$PACKAGE_ID" =~ ^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$ ]]; then
+            echo "Invalid package ID: $PACKAGE_ID"
+            echo "Example: com.myname.myapp"
+            exit 1
           fi
 
-          cordova create myApp "$PKG_ID" "${{ github.event.inputs.app_name }}"
-          cd myApp
-          cordova platform add android@13.0.0
+      - name: Create Cordova Android project
+        run: |
+          APP_NAME="${{ github.event.inputs.app_name }}"
+          PACKAGE_ID="${{ github.event.inputs.package_id }}"
 
-          # 4. Advanced Future AI & Hardware Bridge Pre-Injection
+          SAFE_NAME=$(printf '%s' "$APP_NAME" | tr -dc '[:alnum:]_-')
+          if [ -z "$SAFE_NAME" ]; then
+            SAFE_NAME="UniversalApp"
+          fi
+
+          cordova create "$SAFE_NAME" "$PACKAGE_ID" "$APP_NAME"
+          cd "$SAFE_NAME"
+
+          rm -rf www
           mkdir -p www
-          cat << 'EOF' > www/index.html
-          <!DOCTYPE html>
-          <html>
-          <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-          <script>
-            // Advanced Future AI & Native Hardware Bridge
-            window.AndroidAPI = {
-              vibrate: (ms) => navigator.vibrate && navigator.vibrate(ms || 300),
-              showToast: (msg) => {
-                let t = document.createElement('div');
-                t.innerText = msg;
-                t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:25px;z-index:999999;font-family:sans-serif;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,0.5);';
-                document.body.appendChild(t);
-                setTimeout(() => t.remove(), 2500);
-              },
-              getDeviceInfo: () => ({ ua: navigator.userAgent, aiEngine: 'Neural-WebGPU-Ready', coreVersion: '3.4.0' }),
-              initNeuralEngine: () => { console.log("Future AI Neural Engine Activated"); return true; }
-            };
-            window.addEventListener('DOMContentLoaded', () => {
-              if(window.AndroidAPI && typeof window.AndroidAPI.initNeuralEngine === 'function') {
-                window.AndroidAPI.initNeuralEngine();
-              }
-            });
-          </script>
-          </head>
-          <body style="margin:0;padding:0;">
-          EOF
 
-          # 5. Decode and Append User Custom Code Safely
-          echo "${{ github.event.inputs.html_content }}" | base64 -d >> www/index.html
-          echo "</body></html>" >> www/index.html
+          if [ -d "../app-www" ]; then
+            cp -r ../app-www/* www/
+          else
+            echo "<h1>app-www folder not found</h1>" > www/index.html
+          fi
 
-          # 6. Dynamic AI Core Weight Scaling based on code length
-          CODE_LEN=$(wc -c < www/index.html)
-          DYNAMIC_KB=$(( 2048 + (CODE_LEN * 25 / 100) ))
-          if [ "$DYNAMIC_KB" -gt 30720 ]; then DYNAMIC_KB=30720; fi
-          dd if=/dev/urandom of=www/ai_neural_core.bin bs=1024 count=$DYNAMIC_KB
+          cordova platform add android
+          cordova plugin add cordova-plugin-whitelist
 
-          # 7. WebView Hardware Acceleration Flags
-          sed -i '/<\/widget>/i <preference name="android-hardwareAccelerated" value="true" />' config.xml
-          sed -i '/<\/widget>/i <preference name="AllowInlineMediaPlayback" value="true" />' config.xml
-          sed -i '/<\/widget>/i <access origin="*" />' config.xml
+      - name: Build debug APK
+        run: |
+          APP_NAME="${{ github.event.inputs.app_name }}"
+          SAFE_NAME=$(printf '%s' "$APP_NAME" | tr -dc '[:alnum:]_-')
+          if [ -z "$SAFE_NAME" ]; then
+            SAFE_NAME="UniversalApp"
+          fi
 
-          # 8. Compile Real APK via Gradle
-          cordova build android -- --gradleArg=--no-daemon
+          cd "$SAFE_NAME"
+          cordova build android --debug
 
-          RAW_NAME="${{ github.event.inputs.app_name }}"
-          CLEAN_NAME=$(echo "$RAW_NAME" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/[[:space:]]\+/_/g' | tr -d '/\\:*?"<>|')
-          if [ -z "$CLEAN_NAME" ]; then CLEAN_NAME="CustomApp"; fi
+          APK_FILE=$(find platforms/android/app/build/outputs/apk/debug -name "*.apk" | head -n 1)
 
-          mkdir -p final_apk
-          SOURCE_APK=$(find platforms/android -name "*.apk" | head -n 1)
-          mv "$SOURCE_APK" "final_apk/${CLEAN_NAME}.apk"
+          if [ -z "$APK_FILE" ]; then
+            echo "APK was not created"
+            exit 1
+          fi
 
-      - name: Publish Direct Public Release
+          cp "$APK_FILE" "${SAFE_NAME}.apk"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: |
+            */*.apk
+            */platforms/android/app/build/outputs/apk/debug/*.apk
+
+      - name: Publish APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}-${{ github.run_id }}
-          name: "Release ${{ github.event.inputs.app_name }}"
-          files: myApp/final_apk/*.apk
+          name: "Release - ${{ github.event.inputs.app_name }}"
+          files: |
+            */*.apk
+            */platforms/android/app/build/outputs/apk/debug/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
