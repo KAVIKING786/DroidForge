@@ -53,7 +53,7 @@
         </label>
         <div class="flex-1">
           <label class="block text-xs font-medium text-slate-300 mb-1">App Name *</label>
-          <input type="text" id="appName" value="Modern Calendar App" class="w-full input-box rounded-xl p-2.5 text-sm font-medium">
+          <input type="text" id="appName" value="DroidForge App" class="w-full input-box rounded-xl p-2.5 text-sm font-medium">
         </div>
       </div>
 
@@ -70,7 +70,7 @@
       <!-- Package Name -->
       <div>
         <label class="block text-xs font-medium text-slate-300 mb-1">Package Name *</label>
-        <input type="text" id="packageId" value="com.droidforge.calendar" class="w-full input-box rounded-xl p-2.5 text-xs font-mono">
+        <input type="text" id="packageId" value="com.droidforge.app" class="w-full input-box rounded-xl p-2.5 text-xs font-mono">
         <p class="text-[10px] text-slate-500 mt-0.5">Android Application ID (e.g. com.company.app)</p>
       </div>
 
@@ -96,143 +96,37 @@
 
         <input type="url" id="urlInput" value="https://google.com" class="w-full input-box rounded-xl p-2.5 text-xs hidden" placeholder="https://example.com">
 
-        <!-- INTEGRATED FULL ENGLISH CALENDAR & REMINDER HTML CODE -->
+        <!-- CLEAN DEFAULT DROIDFORGE APP HTML CODE (NO CALENDAR) -->
         <textarea id="htmlInput" rows="8" class="w-full input-box rounded-xl p-2.5 text-xs font-mono"><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern English Calendar - DroidForge</title>
+    <title>DroidForge App</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #0b0f19; color: #f3f4f6; padding: 16px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 480px; background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .header h2 { font-size: 20px; color: #60a5fa; }
-        .today-btn { background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; margin-bottom: 20px; }
-        .day-name { font-size: 12px; font-weight: bold; color: #9ca3af; padding-bottom: 8px; }
-        .day-box { background: #1f2937; padding: 10px 0; border-radius: 8px; font-size: 14px; cursor: pointer; transition: background 0.2s; }
-        .day-box:hover { background: #374151; }
-        .day-box.selected { background: #3b82f6; color: white; font-weight: bold; }
-        .day-box.empty { background: transparent; cursor: default; }
-        .section-title { font-size: 14px; color: #9ca3af; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .task-input-group { display: flex; gap: 8px; margin-bottom: 20px; }
-        .task-input { flex: 1; background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 10px 14px; color: white; font-size: 14px; outline: none; }
-        .add-btn { background: #10b981; color: white; border: none; padding: 0 16px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .reminders-list { max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .reminder-item { background: #1f2937; padding: 10px 12px; border-radius: 8px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #3b82f6; }
-        .delete-btn { background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 14px; }
-        .bridge-status { margin-top: 15px; padding: 8px; background: #030712; border-radius: 6px; font-size: 11px; color: #6b7280; text-align: center; word-break: break-all; }
+        body { background-color: #0d1117; color: #f3f4f6; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
+        .container { width: 100%; max-width: 400px; background: #161b22; border: 1px solid #30363d; border-radius: 16px; padding: 24px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); }
+        h2 { font-size: 22px; color: #58a6ff; margin-bottom: 10px; }
+        p { font-size: 14px; color: #8b949e; margin-bottom: 20px; }
+        .btn { background: #238636; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div>
-                <h2 id="month-year-title">November 2026</h2>
-                <p id="selected-date-subtitle" style="font-size: 12px; color: #9ca3af; margin-top: 2px;">Thursday, Nov 12</p>
-            </div>
-            <button class="today-btn" onclick="goToToday()">Today</button>
-        </div>
-        <div class="calendar-grid" id="calendar-days-container">
-            <div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div><div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name">Fri</div><div class="day-name">Sat</div>
-        </div>
-        <div class="section-title">Add Reminder or Task</div>
-        <div class="task-input-group">
-            <input type="text" id="task-input-box" class="task-input" placeholder="Type event or note...">
-            <button class="add-btn" onclick="addReminder()">+</button>
-        </div>
-        <div class="section-title">Reminders & Notes</div>
-        <div class="reminders-list" id="reminders-container">
-            <div class="reminder-item" style="border-left-color: #6b7280; color: #9ca3af;">No reminders for this day.</div>
-        </div>
-        <div class="bridge-status" id="bridge-status-text">Initializing DroidForge Bridge...</div>
+        <h2>DroidForge App</h2>
+        <p>Your custom HTML app is successfully running with native Android bridge!</p>
+        <button class="btn" onclick="alert('Button Clicked!')">Click Me</button>
     </div>
-    <script>
-        let selectedDateStr = "2026-11-12";
-        let remindersData = {};
-        function initCalendar() { renderCalendarGrid(); checkNativeBridge(); }
-        function renderCalendarGrid() {
-            const container = document.getElementById('calendar-days-container');
-            const headers = container.querySelectorAll('.day-name');
-            container.innerHTML = '';
-            headers.forEach(h => container.appendChild(h));
-            for (let day = 1; day <= 30; day++) {
-                let dayDiv = document.createElement('div');
-                dayDiv.className = 'day-box';
-                dayDiv.textContent = day;
-                let currentStr = `2026-11-${day < 10 ? '0' + day : day}`;
-                if (currentStr === selectedDateStr) dayDiv.classList.add('selected');
-                dayDiv.onclick = () => {
-                    selectedDateStr = currentStr;
-                    document.getElementById('selected-date-subtitle').textContent = `November ${day}, 2026`;
-                    renderCalendarGrid(); renderReminders();
-                    if (window.AndroidAPI && window.AndroidAPI.vibrate) window.AndroidAPI.vibrate(50);
-                };
-                container.appendChild(dayDiv);
-            }
-        }
-        function goToToday() { selectedDateStr = "2026-11-12"; document.getElementById('selected-date-subtitle').textContent = `November 12, 2026`; renderCalendarGrid(); renderReminders(); }
-        function addReminder() {
-            const input = document.getElementById('task-input-box');
-            let text = input.value.trim();
-            if (!text) return;
-            if (!remindersData[selectedDateStr]) remindersData[selectedDateStr] = [];
-            remindersData[selectedDateStr].push(text);
-            input.value = ''; renderReminders();
-            if (window.AndroidAPI && window.AndroidAPI.showToast) window.AndroidAPI.showToast("Reminder added!");
-        }
-        function deleteReminder(index) { if (remindersData[selectedDateStr]) { remindersData[selectedDateStr].splice(index, 1); renderReminders(); } }
-        function renderReminders() {
-            const container = document.getElementById('reminders-container');
-            container.innerHTML = '';
-            let list = remindersData[selectedDateStr] || [];
-            if (list.length === 0) { container.innerHTML = `<div class="reminder-item" style="border-left-color: #6b7280; color: #9ca3af;">No reminders for this day.</div>`; return; }
-            list.forEach((item, idx) => {
-                let div = document.createElement('div');
-                div.className = 'reminder-item';
-                div.innerHTML = `<span>${item}</span><button class="delete-btn" onclick="deleteReminder(${idx})">✕</button>`;
-                container.appendChild(div);
-            });
-        }
-        function checkNativeBridge() {
-            const statusEl = document.getElementById('bridge-status-text');
-            if (window.AndroidAPI) {
-                try { let info = JSON.parse(window.AndroidAPI.getDeviceInfo()); statusEl.textContent = `Bridge Active | ${info.platform}`; } catch(e) { statusEl.textContent = "DroidForge Bridge Connected"; }
-            } else { statusEl.textContent = "Browser Mode (Bridge Ready)"; }
-        }
-        window.onload = initCalendar;
-    </script>
 </body>
 </html></textarea>
       </div>
-
-      <!-- MULTI-ADMOB MONETIZATION -->
-      <details class="rounded-xl border border-slate-800 bg-[#161b22] p-3">
-        <summary class="text-xs font-semibold text-amber-400 cursor-pointer flex justify-between items-center">
-          <span>💰 Monetization / AdMob (Multi-Ads)</span>
-          <span class="text-slate-500 text-[10px]">▼</span>
-        </summary>
-        <div class="mt-3 space-y-2 pt-2 border-t border-slate-800 text-xs">
-          <div><label class="text-slate-400 block mb-0.5">AdMob App ID</label><input type="text" id="admobId" placeholder="ca-app-pub-xxxxxxxx~yyyyyyyy" class="w-full input-box rounded-lg p-2 text-xs font-mono"></div>
-          <div><label class="text-slate-400 block mb-0.5">1. Banner Ad Unit ID</label><input type="text" id="admobBanner" placeholder="ca-app-pub-xxxxxxxx/banner_id" class="w-full input-box rounded-lg p-2 text-xs font-mono"></div>
-          <div><label class="text-slate-400 block mb-0.5">2. Interstitial Ad Unit ID</label><input type="text" id="admobInter" placeholder="ca-app-pub-xxxxxxxx/inter_id" class="w-full input-box rounded-lg p-2 text-xs font-mono"></div>
-        </div>
-      </details>
 
     </div>
 
     <!-- TAB 2: TEMPLATES -->
     <div id="tabTpl" class="hidden space-y-3">
       <p class="text-xs text-slate-400 mb-2">Ready-made HTML projects that use native Android APIs.</p>
-      <div onclick="applyTemplate('interaction')" class="bg-gradient-to-r from-emerald-950/40 to-[#161b22] border border-emerald-800/40 p-3.5 rounded-xl flex items-center justify-between cursor-pointer hover:border-emerald-500">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">📺</div>
-          <div><h4 class="text-xs font-bold text-white">Interaction</h4><p class="text-[10px] text-slate-400">Toast, vibration, flashlight and notification...</p></div>
-        </div>
-        <span class="text-slate-500">›</span>
-      </div>
     </div>
 
     <!-- TAB 3: SETTINGS -->
@@ -240,14 +134,6 @@
       <div class="bg-[#161b22] border border-slate-800 rounded-2xl divide-y divide-slate-800/80 overflow-hidden text-xs">
         <div onclick="openLanguageModal()" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
           <div class="flex items-center gap-3"><span class="text-sky-400 text-sm">🌐</span><div><div class="font-bold text-white">Language</div><div id="currentLangLabel" class="text-[10px] text-slate-400">System default (English)</div></div></div>
-          <span class="text-slate-500">›</span>
-        </div>
-        <div onclick="openThemeModal()" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
-          <div class="flex items-center gap-3"><span class="text-indigo-400 text-sm">🎨</span><div><div class="font-bold text-white">Theme</div><div class="text-[10px] text-slate-400">System (Dark Mode)</div></div></div>
-          <span class="text-slate-500">›</span>
-        </div>
-        <div onclick="clearAllAppCache()" class="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/30">
-          <div class="flex items-center gap-3"><span class="text-rose-400 text-sm">🗑️</span><div><div class="font-bold text-white">Clear Cache</div><div class="text-[10px] text-slate-400">Clean temporary build files</div></div></div>
           <span class="text-slate-500">›</span>
         </div>
       </div>
@@ -278,19 +164,6 @@
       </div>
     </div>
 
-  </div>
-</div>
-
-<!-- MODALS -->
-<div id="dfModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-  <div class="bg-[#12161f] border border-slate-700/80 rounded-2xl w-full max-w-md max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
-    <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-[#161b26]">
-      <div class="flex items-center gap-2">
-        <button onclick="closeDfModal()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center text-sm">✕</button>
-        <h3 id="dfModalTitle" class="font-bold text-sm text-white">Title</h3>
-      </div>
-    </div>
-    <div id="dfModalBody" class="p-4 overflow-y-auto space-y-3 text-xs flex-1"></div>
   </div>
 </div>
 
@@ -331,8 +204,9 @@
   }
 
   async function runBuildPipeline() {
-    const appName = document.getElementById('appName').value.trim() || 'Modern Calendar App';
-    const packageId = document.getElementById('packageId').value.trim() || 'com.droidforge.calendar';
+    const appName = document.getElementById('appName').value.trim() || 'DroidForge App';
+    const packageId = document.getElementById('packageId').value.trim() || 'com.droidforge.app';
+    const buildId = 'b' + Math.random().toString(36).substring(2, 10);
     let codeToPack = currentSource === 'url' ? `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body,iframe{margin:0;padding:0;width:100%;height:100%;border:none;overflow:hidden}</style></head><body><iframe src="${document.getElementById('urlInput').value.trim()}"></iframe></body></html>` : document.getElementById('htmlInput').value.trim();
 
     const encodedCode = btoa(unescape(encodeURIComponent(codeToPack)));
@@ -352,11 +226,10 @@
       await fetch(PROXY_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ ref: 'main', inputs: { app_name: appName, package_id: packageId, html_content: encodedCode } })
+        body: JSON.stringify({ ref: 'main', inputs: { app_name: appName, package_id: packageId, build_id: buildId, html_content: encodedCode } })
       });
 
       let sec = 0, pct = 20;
-      const triggerTime = Date.now();
       const timer = setInterval(async () => {
         sec += 5;
         if (pct < 95) pct += Math.floor(Math.random() * 2) + 1;
@@ -368,10 +241,10 @@
             const relRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases?per_page=10&_=${Date.now()}`, { cache: 'no-store' });
             if (relRes.ok) {
               const relList = await relRes.json();
-              let foundApk = null, foundRel = null;
+              let foundApk = null;
               for (const rel of relList) {
                 const apkAsset = (rel.assets || []).find(a => a.name.toLowerCase().endsWith('.apk'));
-                if (apkAsset) { foundApk = apkAsset; foundRel = rel; break; }
+                if (apkAsset) { foundApk = apkAsset; break; }
               }
               if (foundApk) {
                 clearInterval(timer);
@@ -395,14 +268,6 @@
     }
   }
 
-  function openDfModal(title, html) {
-    document.getElementById('dfModalTitle').innerText = title;
-    document.getElementById('dfModalBody').innerHTML = html;
-    document.getElementById('dfModal').classList.remove('hidden');
-  }
-  function closeDfModal() { document.getElementById('dfModal').classList.add('hidden'); }
-  function openLanguageModal() { openDfModal("Language", "<p class='text-slate-300'>English (Default)</p>"); }
-  function openThemeModal() { openDfModal("Theme", "<p class='text-slate-300'>Default Dark (GitHub Slate)</p>"); }
   function clearAllAppCache() { if (confirm("Clear cache?")) { localStorage.clear(); alert("Cache cleared!"); } }
 </script>
 
