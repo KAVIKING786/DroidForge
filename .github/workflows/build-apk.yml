@@ -62,7 +62,9 @@ jobs:
       - name: Manual Setup Android SDK & Build Tools
         run: |
           echo "Setting up Android SDK manually..."
-          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          
+          # Use the default GitHub runner Android SDK path to avoid conflicts
+          export ANDROID_SDK_ROOT=$ANDROID_HOME
           mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
           
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
@@ -70,8 +72,9 @@ jobs:
           rm -rf $ANDROID_SDK_ROOT/cmdline-tools/latest
           mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
           
-          # Add to PATH properly for this step and subsequent steps
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          # Unify environment variables
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
           echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
           
