@@ -83,8 +83,12 @@ jobs:
           mkdir -p $ANDROID_HOME/licenses
           echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_HOME/licenses/android-sdk-license
           echo -e "\n84831b4009041a66fb040813084c6626e1ad354f" > $ANDROID_HOME/licenses/android-sdk-preview-license
-          yes | sdkmanager --licenses || true
-          sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          
+          # Force download correct command-line tools
+          sdkmanager --sdk_root=${ANDROID_HOME} "cmdline-tools;latest" || true
+          yes | sdkmanager --sdk_root=${ANDROID_HOME} --licenses || true
+          sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-34" "build-tools;34.0.0"
+
 
       - name: Install Cordova
         run: npm install -g cordova
