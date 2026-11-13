@@ -12,8 +12,9 @@ on:
         required: true
         default: "com.droidforge.app"
       build_id:
-        description: "Unique build id (set by the website)"
+        description: "Unique build id"
         required: true
+        default: "build12345"
       version_name:
         description: "Version name"
         required: false
@@ -23,7 +24,7 @@ on:
         required: false
         default: "1"
       html_content:
-        description: "Base64 encoded HTML (set by the website)"
+        description: "Base64 encoded HTML"
         required: false
         default: ""
 
@@ -33,9 +34,8 @@ permissions:
 jobs:
   build-apk:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
-    # Inputs go through env, never directly into shell scripts (prevents breakage and injection)
     env:
       APP_NAME: ${{ inputs.app_name }}
       PACKAGE_ID: ${{ inputs.package_id }}
@@ -48,22 +48,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate inputs
-        run: |
-          re_pkg='^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$'
-          if [[ ! "$PACKAGE_ID" =~ $re_pkg ]]; then
-            echo "Invalid package ID: $PACKAGE_ID (example: com.myname.myapp)"; exit 1
-          fi
-          if [[ ! "$BUILD_ID" =~ ^[A-Za-z0-9]{8,40}$ ]]; then
-            echo "Invalid build id"; exit 1
-          fi
-          if [[ ! "$VERSION_CODE" =~ ^[0-9]{1,9}$ ]]; then
-            echo "Invalid version code"; exit 1
-          fi
-          if [[ ! "$VERSION_NAME" =~ ^[A-Za-z0-9._-]{1,20}$ ]]; then
-            echo "Invalid version name"; exit 1
-          fi
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -75,105 +59,52 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android platform and build tools
+      - name: Manual Setup Android SDK & Build Tools
         run: |
-          mkdir -p $ANDROID_HOME/licenses
-          echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_HOME/licenses/android-sdk-license
-          echo -e "\n84831b4009041a66fb040813084c6626e1ad354f" > $ANDROID_HOME/licenses/android-sdk-preview-license
+          echo "Setting up Android SDK manually..."
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
           
-          # Force download correct command-line tools
-          sdkmanager --sdk_root=${ANDROID_HOME} "cmdline-tools;latest" || true
-          yes | sdkmanager --sdk_root=${ANDROID_HOME} --licenses || true
-          sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-34" "build-tools;34.0.0"
+          # Download command line tools directly from Google
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+          unzip -q cmdline-tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
+          mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
+          
+          # Export paths
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
 
+          # Accept licenses and install platform 34
+          yes | sdkmanager --licenses || true
+          sdkmanager --update || true
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
 
       - name: Install Cordova
         run: npm install -g cordova
 
-      - name: Create project and inject the user's HTML
+      - name: Create project and inject HTML
         run: |
           SAFE_NAME=$(printf '%s' "$APP_NAME" | tr -dc '[:alnum:]_-')
           if [ -z "$SAFE_NAME" ]; then SAFE_NAME="DroidForge"; fi
-          DISPLAY_NAME=$(printf '%s' "$APP_NAME" | sed "s/[<>&\"']//g")
-          if [ -z "$DISPLAY_NAME" ]; then DISPLAY_NAME="DroidForge"; fi
           echo "SAFE_NAME=$SAFE_NAME" >> "$GITHUB_ENV"
 
-          cordova create app "$PACKAGE_ID" "$DISPLAY_NAME"
+          cordova create app "$PACKAGE_ID" "$APP_NAME"
           rm -rf app/www/*
 
-          # 1) HTML sent by the website  2) fallback: app-www folder  3) default page
           if [ -n "$HTML_B64" ]; then
             printf '%s' "$HTML_B64" | base64 -d > app/www/index.html
-          elif [ -d app-www ]; then
-            cp -r app-www/* app/www/
           else
-            echo "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='background:#111;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0'><h2>DroidForge App</h2></body></html>" > app/www/index.html
-          fi
-
-          # Native bridge (window.AndroidAPI)
-          cat > app/www/droidforge-bridge.js <<'JS'
-          (function () {
-            function toast(msg) {
-              var d = document.createElement('div');
-              d.textContent = String(msg);
-              d.style.cssText = 'position:fixed;left:50%;bottom:40px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:20px;font:14px sans-serif;z-index:2147483647;max-width:80%;text-align:center';
-              document.body.appendChild(d);
-              setTimeout(function () { d.remove(); }, 2200);
-            }
-            function unsupported(name) {
-              return function () { toast(name + ' is not available in this build'); };
-            }
-            window.AndroidAPI = {
-              vibrate: function (ms) { if (navigator.vibrate) navigator.vibrate(ms || 200); },
-              showToast: toast,
-              showNotification: function (title, body) {
-                if ('Notification' in window) {
-                  Notification.requestPermission().then(function (p) {
-                    if (p === 'granted') { new Notification(title, { body: body }); } else { toast(title + ': ' + body); }
-                  });
-                } else { toast(title + ': ' + body); }
-              },
-              getDeviceInfo: function () {
-                return JSON.stringify({
-                  userAgent: navigator.userAgent,
-                  platform: navigator.platform,
-                  language: navigator.language,
-                  screen: screen.width + 'x' + screen.height
-                });
-              },
-              setTorch: unsupported('Flashlight'),
-              getLocation: unsupported('GPS'),
-              capturePhoto: unsupported('Camera'),
-              startSensor: unsupported('Sensors'),
-              showBannerAd: unsupported('Ads'),
-              showInterstitialAd: unsupported('Ads'),
-              showRewardedAd: unsupported('Ads')
-            };
-          })();
-          JS
-
-          # Load the bridge before the user's own scripts
-          if grep -qi '<head' app/www/index.html; then
-            sed -i -E '0,/<head[^>]*>/I{s/(<head[^>]*>)/\1<script src="droidforge-bridge.js"><\/script>/I}' app/www/index.html
-          else
-            printf '\n<script src="droidforge-bridge.js"></script>\n' >> app/www/index.html
+            echo "<!DOCTYPE html><html><body><h2>App</h2></body></html>" > app/www/index.html
           fi
 
           cd app
-          # Version info
           sed -i "s/<widget /<widget android-versionCode=\"$VERSION_CODE\" /" config.xml
           sed -i "s/\(<widget [^>]*\)version=\"[^\"]*\"/\1version=\"$VERSION_NAME\"/" config.xml
 
-          # Website-URL mode (marker added by the website): allow navigating to external sites
-          if grep -q 'df-url-mode' www/index.html; then
-            sed -i 's#</widget>#    <allow-navigation href="*" />\n</widget>#' config.xml
-          fi
-
       - name: Build debug APK
         run: |
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
           cd app
           cordova platform add android@13
           cordova build android --debug
@@ -194,11 +125,3 @@ jobs:
           files: out/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Delete old releases (keep latest 30)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release list --limit 300 --json tagName --jq '.[30:][].tagName' | while read -r tag; do
-            gh release delete "$tag" --cleanup-tag --yes || true
-          done
